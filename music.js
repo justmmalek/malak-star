@@ -26,7 +26,7 @@
     syncButton();
     try {
       // Call synchronously from a trusted gesture when autoplay is blocked.
-      await audio.play();
+      await Promise.all([audio.play(), window.StarAudio?.resume()]);
     } catch (error) {
       if (id !== requestId) return;
       pending = false;
@@ -49,7 +49,7 @@
 
   function firstGesture(event) {
     if (!event.isTrusted || !wantsPlayback || hasStarted || pending || !audio.paused) return;
-    if (event.target instanceof Element && event.target.closest('#music-toggle, audio')) return;
+    if (event.target instanceof Element && event.target.closest('#music-toggle, #voice-note, audio')) return;
     if (event.type === 'keydown' && !['Enter', ' '].includes(event.key)) return;
     void play();
   }
@@ -62,7 +62,7 @@
     hasStarted = true;
     pending = false;
     removeGestureStart();
-    status.textContent = 'أغنيتنا شغّالة · تتكرر معكِ';
+    status.textContent = window.StarAudio?.isDucked() ? 'أغنيتنا بصوت هادي' : 'أغنيتنا شغّالة · تتكرر معكِ';
     syncButton();
     if ('mediaSession' in navigator) navigator.mediaSession.playbackState = 'playing';
   });
@@ -86,6 +86,10 @@
     navigator.mediaSession.setActionHandler('play', () => { void play(); });
     navigator.mediaSession.setActionHandler('pause', pause);
   }
+  document.addEventListener('star:audio-duck', event => {
+    if (!audio.paused) status.textContent = event.detail.ducked ? 'أغنيتنا بصوت هادي' : 'أغنيتنا شغّالة · تتكرر معكِ';
+  });
+  window.StarMusic = {startForVoice() { if (wantsPlayback && audio.paused) void play(); }};
   // Keep a single player outside every view. Browser/OS background policies
   // still apply; navigation inside the site never stops or restarts the song.
   audio.controls = false;

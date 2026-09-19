@@ -6,13 +6,24 @@
   <title>نجمة ملك | Malak’s Star</title>
   <meta name="description" content="إلى ملك اليازوري، نجمة في السماء وحكاية من القلب.">
   <link rel="icon" href="assets/star.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css?v=20260920-voice">
   <script src="vendor/astronomy.browser.min.js" defer></script>
   <script src="vendor/geomagnetism.js" defer></script>
   <script type="module" src="app.js?v=20260920-copy"></script>
-  <script src="music.js?v=20260920-audio" defer></script>
+  <script src="audio-mixer.js?v=20260920-voice" defer></script>
+  <script src="music.js?v=20260920-voice" defer></script>
+  <script src="voice.js?v=20260920-voice" defer></script>
 </head>
 <body>
+  <aside class="voice-note" id="voice-note" aria-label="رسالة صوتية من مالك إلى ملك">
+    <div class="voice-player" dir="ltr">
+      <button id="voice-toggle" class="voice-toggle" type="button" aria-label="تشغيل الرسالة الصوتية" aria-pressed="false" disabled><span id="voice-icon" aria-hidden="true">▶</span></button>
+      <input id="voice-progress" type="range" min="0" max="26" step="0.05" value="0" aria-label="موضع الرسالة الصوتية" disabled>
+      <time id="voice-time">0:00 / 0:26</time>
+    </div>
+    <p id="voice-status" class="sr-only" role="status"></p>
+    <noscript><audio controls src="assets/voice-from-malek.m4a" aria-label="رسالة مالك الصوتية"></audio></noscript>
+  </aside>
   <header class="site-header">
     <a class="brand" href="#" aria-label="نجمة ملك، الرئيسية"><span aria-hidden="true">✦</span> نجمة ملك</a>
     <nav aria-label="التنقل الرئيسي">
