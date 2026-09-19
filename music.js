@@ -62,7 +62,7 @@
     hasStarted = true;
     pending = false;
     removeGestureStart();
-    status.textContent = window.StarAudio?.isDucked() ? 'أغنيتنا بصوت هادي' : 'أغنيتنا شغّالة · تتكرر معكِ';
+    status.textContent = window.StarAudio?.isDucked() ? '' : 'أغنيتنا شغّالة · تتكرر معكِ';
     syncButton();
     if ('mediaSession' in navigator) navigator.mediaSession.playbackState = 'playing';
   });
@@ -87,7 +87,7 @@
     navigator.mediaSession.setActionHandler('pause', pause);
   }
   document.addEventListener('star:audio-duck', event => {
-    if (!audio.paused) status.textContent = event.detail.ducked ? 'أغنيتنا بصوت هادي' : 'أغنيتنا شغّالة · تتكرر معكِ';
+    if (!audio.paused) status.textContent = event.detail.ducked ? '' : 'أغنيتنا شغّالة · تتكرر معكِ';
   });
   window.StarMusic = {startForVoice() { if (wantsPlayback && audio.paused) void play(); }};
   // Keep a single player outside every view. Browser/OS background policies
