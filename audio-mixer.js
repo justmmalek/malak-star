@@ -5,7 +5,7 @@
     ducked = Boolean(value);
     if (musicGain) {
       musicGain.gain.cancelScheduledValues(context.currentTime);
-      musicGain.gain.setTargetAtTime(ducked ? 0.035 : 1, context.currentTime, ducked ? 0.08 : 0.25);
+      musicGain.gain.setTargetAtTime(ducked ? 0.07 : 1, context.currentTime, ducked ? 0.08 : 0.25);
     }
     document.dispatchEvent(new CustomEvent('star:audio-duck', {detail: {ducked}}));
   }
@@ -15,7 +15,7 @@
       if (!AudioContextClass) throw new Error('Web Audio is unavailable');
       context = new AudioContextClass();
       musicGain = context.createGain();
-      musicGain.gain.value = ducked ? 0.035 : 1;
+      musicGain.gain.value = ducked ? 0.07 : 1;
       context.createMediaElementSource(music).connect(musicGain);
       musicGain.connect(context.destination);
     }
