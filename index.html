@@ -10,7 +10,7 @@
   <script src="vendor/astronomy.browser.min.js" defer></script>
   <script src="vendor/geomagnetism.js" defer></script>
   <script type="module" src="app.js"></script>
-  <script src="music.js" defer></script>
+  <script src="music.js?v=20260920-audio" defer></script>
 </head>
 <body>
   <header class="site-header">
@@ -24,13 +24,10 @@
   <aside class="music" aria-label="أغنيتنا">
     <div class="music-bar">
       <span class="music-track"><span aria-hidden="true">♫</span> <bdi lang="en">her · JVKE</bdi></span>
-      <button id="music-toggle" class="outline-button" aria-expanded="false" aria-controls="music-panel" hidden>شغّلي أغنيتنا</button>
-      <noscript><a href="https://www.youtube.com/watch?v=f5-IY_Ja1RM" target="_blank" rel="noopener">اسمعي أغنيتنا</a></noscript>
+      <button id="music-toggle" class="outline-button" aria-pressed="false" aria-controls="background-music" hidden>شغّلي أغنيتنا</button>
     </div>
-    <div id="music-panel" class="music-panel" hidden>
-      <div id="music-player" class="music-player"></div>
-      <p class="music-hint">اضغطي ▶ داخل المشغّل إذا ما بدأ الصوت. <a href="https://www.youtube.com/watch?v=f5-IY_Ja1RM" target="_blank" rel="noopener">افتحيها على YouTube ↗</a></p>
-    </div>
+    <audio id="background-music" src="assets/her-jvke.mp3" autoplay loop playsinline preload="auto" controls aria-label="her — JVKE"></audio>
+    <p id="music-status" class="music-hint" role="status">لمسة منكِ، وتبدأ أغنيتنا ♫</p>
   </aside>
   <main>
     <section id="home-view" class="home-layout" aria-label="نجمة ملك في السماء">
