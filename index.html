@@ -9,7 +9,7 @@
   <link rel="stylesheet" href="style.css">
   <script src="vendor/astronomy.browser.min.js" defer></script>
   <script src="vendor/geomagnetism.js" defer></script>
-  <script type="module" src="app.js"></script>
+  <script type="module" src="app.js?v=20260920-copy"></script>
   <script src="music.js?v=20260920-audio" defer></script>
 </head>
 <body>
@@ -41,8 +41,8 @@
         <p id="visibility-home" class="visibility">جارٍ حساب موقع نجمتك…</p>
       </div>
       <div class="atlas-column">
-        <div class="atlas-frame"><canvas id="sky-map" aria-label="خريطة السماء المحسوبة الآن، مع تمييز إحداثيات صورة الإهداء باسم ملك" role="img"></canvas></div>
-        <p class="map-caption">السماء فوقكِ الآن <span>·</span> الوسط فوق رأسكِ، والدائرة هي الأفق<br>علامة نجمتكِ مكبّرة؛ موضعها محسوب حسب إحداثيات صورتكِ.</p>
+        <div class="atlas-frame"><canvas id="sky-map" aria-label="خريطة السماء الآن، مع تمييز نجمة ملك" role="img"></canvas></div>
+        <p class="map-caption">السماء فوقكِ الآن <span>·</span> الوسط فوق رأسكِ، والدائرة هي الأفق<br>علامة نجمتكِ مكبّرة لتوضيح مكانها.</p>
         <p id="map-error" class="notice" hidden></p>
       </div>
     </section>
@@ -56,7 +56,7 @@
         <p id="sensor-status" class="notice" role="status">اضغطي لتسمحي بحساسات الحركة. امسكي الآيفون مسطّحًا للحظة، ثم ارفعيه نحو السماء.</p>
         <div class="guide-actions"><button id="use-location" class="outline-button">استخدمي موقعي الحالي</button><button id="reset-location" class="text-button small">سماء عمّان</button></div>
         <p id="location-status" class="muted">نستخدم وسط عمّان كموقع تقريبي. موقعكِ الحالي يُحسب داخل جهازكِ.</p>
-        <details class="help"><summary>إذا احتجتِ مساعدة</summary><p>افتحي الرابط مباشرة في Safari. اسمحي بالحركة عند الطلب. ابتعدي عن المعادن والمغناطيس وحرّكي الجهاز بشكل رقم 8 لمعايرة البوصلة.</p><p>التوجيه تقريبي ويستخدم الإحداثيات المكتوبة في صورة الإهداء. السطوع المذكور فيها خافت جدًا ويحتاج تلسكوبًا؛ الهاتف يدلّكِ على الاتجاه فقط. الخريطة حساب لموضع الإهداء، وليست بثًا مباشرًا.</p><button id="calibrate-north" class="outline-button">معايرة يدوية على الشمال الحقيقي</button><p id="calibration-status">للمعايرة اليدوية: اجعلي الشاشة عمودية ووجّهي ظهر الهاتف نحو الشمال الحقيقي، ثم اضغطي الزر.</p></details>
+        <details class="help"><summary>إذا احتجتِ مساعدة</summary><p>افتحي الرابط مباشرة في Safari. اسمحي بالحركة عند الطلب. ابتعدي عن المعادن والمغناطيس وحرّكي الجهاز بشكل رقم 8 لمعايرة البوصلة.</p><p>الهاتف يدلّكِ على اتجاه نجمتكِ. تابعي السهم وارفعي الهاتف بهدوء حتى تصل العلامة إلى منتصف الدائرة.</p><button id="calibrate-north" class="outline-button">معايرة يدوية على الشمال الحقيقي</button><p id="calibration-status">للمعايرة اليدوية: اجعلي الشاشة عمودية ووجّهي ظهر الهاتف نحو الشمال الحقيقي، ثم اضغطي الزر.</p></details>
       </div>
       <div class="finder-column">
         <div id="finder" class="finder" role="img" aria-label="مؤشر توجيه الهاتف نحو النجمة">
@@ -72,13 +72,12 @@
       </div>
     </section>
     <section id="certificate-view" class="certificate-view" aria-labelledby="certificate-title" hidden>
-      <div class="certificate-heading"><div><button class="back-link" data-view="home">← العودة لنجمتي</button><h1 id="certificate-title">نجمة تحمل اسمكِ في حكايتنا.</h1></div><a class="gold-button download" href="assets/Malak-Alyazuri-Star-Certificate.pdf" download>تنزيل الشهادة PDF ↓</a></div>
-      <a class="certificate-preview" href="assets/Malak-Alyazuri-Star-Certificate.jpg" target="_blank" rel="noopener" aria-label="افتحي شهادة ملك بالحجم الكامل"><img src="assets/Malak-Alyazuri-Star-Certificate.jpg" alt="صورة الإهداء المرفقة إلى ملك اليازوري، Malak Alyazuri، من مالك، بتاريخ 19 سبتمبر 2026" width="864" height="1244" loading="lazy"></a>
-      <p class="muted certificate-note">إهداء رمزي من مالك إلى ملك. الصورة مرفقة من صاحب الإهداء، ولا يثبت الموقع صدورها عن شركة تسجيل.</p>
+      <div class="certificate-heading"><div><button class="back-link" data-view="home">← العودة لنجمتي</button><h1 id="certificate-title">شهادتكِ، بكل الحب.</h1></div><a class="gold-button download" href="assets/Malak-Alyazuri-Star-Certificate.pdf" download>تنزيل الشهادة PDF ↓</a></div>
+      <a class="certificate-preview" href="assets/Malak-Alyazuri-Star-Certificate.jpg" target="_blank" rel="noopener" aria-label="افتحي شهادة ملك بالحجم الكامل"><img src="assets/Malak-Alyazuri-Star-Certificate.jpg" alt="شهادة إهداء إلى ملك اليازوري، Malak Alyazuri، من مالك، بتاريخ 19 سبتمبر 2026" width="864" height="1244" loading="lazy"></a>
+      <p class="muted certificate-note">من مالك، بكل الحب، إلى ملك اليازوري.</p>
     </section>
     <noscript><p class="notice">فعّلي JavaScript لعرض الخريطة والتوجيه. <a href="assets/Malak-Alyazuri-Star-Certificate.pdf">شهادة ملك متاحة هنا.</a></p></noscript>
   </main>
   <footer class="status-bar"><div class="status-facts"><span id="location-label">عمّان، الأردن · موقع تقريبي</span><span>السمت <b id="azimuth">—</b></span><span>الارتفاع <b id="altitude">—</b></span></div><time id="live-time"></time></footer>
-  <details class="about-star"><summary>عن نجمتكِ وبياناتها</summary><p>«ملك اليازوري» هو اسم الإهداء في حكايتنا. تعرض الخريطة موضع الإحداثيات المكتوبة في صورتكِ: <bdi>15h 23m 41.2s / +67° 11′ 09″</bdi>، ويظل هذا الموضع فوق أفق عمّان خلال اليوم. القدر 15.2 المذكور في الصورة خافت جدًا ولا يُرى بالعين المجردة.</p><p>رقم <bdi>USNO-A2.0 1500-0812345</bdi> الوارد في الصورة لا يطابق هذه الإحداثيات في <a href="https://vizier.cds.unistra.fr/viz-bin/VizieR?-source=I/252/out&amp;USNO-A2.0=1500-00812345" target="_blank" rel="noopener">كتالوج VizieR</a>؛ لذلك يعتمد التوجيه على إحداثيات الصورة فقط، ولا يؤكد هوية نجمة مسجلة أو تسجيل الاسم لدى شركة.</p><p>الإحداثيات مفترضة بمرجع J2000. الحسابات باستخدام <a href="https://github.com/cosinekitty/astronomy" target="_blank" rel="noopener">Astronomy Engine</a>، وبيانات الخريطة من <a href="https://github.com/ofrohn/d3-celestial" target="_blank" rel="noopener">D3 Celestial</a>. تصحيح بوصلة الآيفون وفق نموذج WMM.</p></details>
 </body>
 </html>

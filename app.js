@@ -17,7 +17,7 @@ function showView(view){
 buttons.forEach(button=>button.addEventListener('click',()=>showView(button.dataset.view)));
 document.querySelector('.brand').addEventListener('click',event=>{event.preventDefault();showView('home');});
 $('start-guide').addEventListener('click',()=>showView('guide'));
-function visibilityText(p){if(p.altitude<=0)return 'موضع نجمتكِ تحت الأفق الآن من هذا المكان.';if(p.sunAltitude>-6)return 'موضع نجمتكِ فوق الأفق الآن · السماء لم تُظلم بعد.';return 'موضع نجمتكِ فوق الأفق الآن · حسب إحداثيات صورتكِ.';}
+function visibilityText(p){if(p.altitude<=0)return 'موضع نجمتكِ تحت الأفق الآن من هذا المكان.';if(p.sunAltitude>-6)return 'موضع نجمتكِ فوق الأفق الآن · السماء لم تُظلم بعد.';return 'موضع نجمتكِ فوق الأفق الآن.';}
 function refresh(){
   if(!A){$('visibility-home').textContent='تعذّر تحميل حسابات السماء. أعيدي فتح الصفحة.';return;}
   try{position=dedicatedStarPosition(new Date(),location,A);}catch(error){$('visibility-home').textContent='تعذّر حساب موقع النجمة. أعيدي المحاولة.';return;}
