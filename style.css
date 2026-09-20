@@ -11,3 +11,5 @@
 @media(max-width:680px){.dedication>.voice-note{order:2;max-width:390px;padding:12px 14px;margin:18px 0 8px}}
 
 #music-status:empty{display:none}
+
+.north-calibration{margin:12px 0;padding:12px;border:1px solid var(--line);border-radius:5px}.north-calibration p{margin-bottom:0}@media(max-width:680px){.guide-copy>.north-calibration{order:4;width:100%;margin:0}}

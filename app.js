@@ -1,9 +1,11 @@
-import {DEG,wrap,angleDifference,rotationMatrix,pointing,targetInScreen,starVector,dedicatedStarPosition,DEDICATED_STAR} from './sky-math.mjs';
+import {DEG,rotationMatrix,pointing,targetInScreen,starVector,dedicatedStarPosition,DEDICATED_STAR} from './sky-math.mjs';
+import {OrientationTracker} from './orientation.mjs?v=20260920-motion';
 const $=id=>document.getElementById(id);
 const A=window.Astronomy;
 const AMMAN={lat:31.9539,lon:35.9106,height:800};
-let location={...AMMAN},catalog=[],currentView='home',position=null,sensors=false,lastSensor=0,lastEvent=null,yawOffset=null,manualOffset=null,lastMatrix=null,compassAccuracy=null;
-let sensorTimer=null,frame=null,previousAbsolute=0,geoRequest=0,declinationCache={};
+let location={...AMMAN},catalog=[],currentView='home',position=null,sensors=false,lastReading=0,lastMatrix=null;
+let tracker=new OrientationTracker(),sensorReliable=false,sensorManual=false;
+let sensorTimer=null,frame=null,geoRequest=0,declinationCache={},sensorSession=0,permissionPending=false,resumeGuide=false;
 const formatDegree=n=>`${n.toFixed(1)}°`;
 const buttons=[...document.querySelectorAll('[data-view]')];
 function showView(view){
@@ -14,9 +16,9 @@ function showView(view){
   if(view==='home') drawMap();
   window.scrollTo({top:0,behavior:'instant'});
 }
-buttons.forEach(button=>button.addEventListener('click',()=>showView(button.dataset.view)));
+buttons.forEach(button=>button.addEventListener('click',()=>{showView(button.dataset.view);if(button.dataset.view==='guide'&&!sensors&&!permissionPending)void enableSensors();}));
 document.querySelector('.brand').addEventListener('click',event=>{event.preventDefault();showView('home');});
-$('start-guide').addEventListener('click',()=>showView('guide'));
+$('start-guide').addEventListener('click',()=>{showView('guide');void enableSensors();});
 function visibilityText(p){if(p.altitude<=0)return 'موضع نجمتكِ تحت الأفق الآن من هذا المكان.';if(p.sunAltitude>-6)return 'موضع نجمتكِ فوق الأفق الآن · السماء لم تُظلم بعد.';return 'موضع نجمتكِ فوق الأفق الآن.';}
 function refresh(){
   if(!A){$('visibility-home').textContent='تعذّر تحميل حسابات السماء. أعيدي فتح الصفحة.';return;}
@@ -51,42 +53,45 @@ function drawMap(){
   c.restore();
 }
 function setSensorStatus(text){$('sensor-status').textContent=text;}
-function stopSensors(){sensors=false;window.removeEventListener('deviceorientation',onOrientation);window.removeEventListener('deviceorientationabsolute',onOrientation);clearInterval(sensorTimer);sensorTimer=null;if(frame)cancelAnimationFrame(frame);frame=null;lastMatrix=null;$('enable-motion').textContent='تشغيل التوجيه بالتلفون';$('enable-motion').disabled=false;$('target-dot').hidden=true;$('direction-arrow').hidden=true;$('finder-idle').hidden=false;$('finder').classList.remove('aligned');}
+function resetFinder(message='شغّلي التوجيه لتبدئي'){
+  lastMatrix=null;$('target-dot').hidden=true;$('direction-arrow').hidden=true;$('finder-idle').hidden=false;$('finder').classList.remove('aligned');
+  $('finder-idle').querySelector('small').textContent=message;
+  $('direction-text').textContent='اتبعي موقع نجمتكِ الآن.';
+  $('pointing-reading').textContent='حساب الموقع يتجدّد تلقائيًا';
+}
+function stopSensors(){sensorSession++;permissionPending=false;sensors=false;window.removeEventListener('deviceorientation',onOrientation);window.removeEventListener('deviceorientationabsolute',onOrientation);clearInterval(sensorTimer);sensorTimer=null;if(frame)cancelAnimationFrame(frame);frame=null;$('enable-motion').textContent='تشغيل التوجيه بالتلفون';$('enable-motion').disabled=false;$('north-calibration').hidden=true;resetFinder();}
 function magneticDeclination(){const key=`${new Date().toISOString().slice(0,10)}:${location.lat}:${location.lon}`;if(declinationCache.key===key)return declinationCache.value;try{const value=window.geomagnetism.model(new Date()).point([location.lat,location.lon,(location.height||0)/1000]).decl;declinationCache={key,value};return value;}catch{return null;}}
 async function enableSensors(){
-  stopSensors();lastSensor=0;lastEvent=null;yawOffset=null;manualOffset=null;previousAbsolute=0;compassAccuracy=null;
+  if(permissionPending)return;
+  stopSensors();const session=sensorSession;lastReading=0;tracker=new OrientationTracker();sensorReliable=false;sensorManual=false;resumeGuide=false;
   if(!window.isSecureContext){setSensorStatus('افتحي رابط الموقع الآمن HTTPS في Safari لتشغيل البوصلة.');return;}
   if(typeof window.DeviceOrientationEvent==='undefined'){setSensorStatus('هذا الجهاز لا يوفّر حساسات الاتجاه. افتحي الرابط على الآيفون، أو استخدمي اتجاه النجمة وارتفاعها أعلاه.');return;}
-  $('enable-motion').disabled=true;
-  try{if(typeof DeviceOrientationEvent.requestPermission==='function'){const permission=await DeviceOrientationEvent.requestPermission(true);if(permission!=='granted'){setSensorStatus('إذن الحركة غير مسموح. اسمحي به من إعدادات Safari أو أعيدي فتح الصفحة؛ اتجاه النجمة متاح أعلاه.');return;}}
-    sensors=true;window.addEventListener('deviceorientation',onOrientation);window.addEventListener('deviceorientationabsolute',onOrientation);$('enable-motion').textContent='إعادة تشغيل ومعايرة';setSensorStatus('امسكي الآيفون مسطّحًا لحظة حتى تتصل البوصلة، ثم وجّهي ظهره نحو السماء.');
-    const started=Date.now();sensorTimer=setInterval(()=>{if(Date.now()-(lastSensor||started)>6500){lastMatrix=null;$('target-dot').hidden=true;$('direction-arrow').hidden=true;$('finder-idle').hidden=false;$('finder').classList.remove('aligned');setSensorStatus(lastSensor?'توقفت بيانات الحساس. أعيدي تشغيل التوجيه.':'لم تصل قراءة صالحة من البوصلة. افتحي الرابط في Safari على الآيفون واسمحي بالحركة.');}},1000);
-  }catch{setSensorStatus('تعذّر تشغيل الحساس. افتحي الرابط مباشرة في Safari ثم حاولي مرة أخرى.');}finally{$('enable-motion').disabled=false;}
+  permissionPending=true;$('enable-motion').disabled=true;setSensorStatus('اسمحي بالحركة إذا ظهر طلب، ثم حرّكي الهاتف بهدوء.');
+  try{if(typeof DeviceOrientationEvent.requestPermission==='function'){const permission=await DeviceOrientationEvent.requestPermission(true);if(session!==sensorSession||currentView!=='guide')return;if(permission!=='granted'){resetFinder('إذن الحركة مطلوب');setSensorStatus('إذن الحركة غير مسموح. اسمحي به من إعدادات Safari أو أعيدي فتح الصفحة؛ اتجاه النجمة متاح أعلاه.');return;}}
+    if(session!==sensorSession||currentView!=='guide')return;
+    sensors=true;window.addEventListener('deviceorientation',onOrientation);window.addEventListener('deviceorientationabsolute',onOrientation);$('enable-motion').textContent='إعادة تشغيل ومعايرة';resetFinder('بانتظار البوصلة…');setSensorStatus('حرّكي الهاتف قليلًا لالتقاط البوصلة، ثم وجّهي ظهره نحو السماء.');
+    const started=Date.now();sensorTimer=setInterval(()=>{if(Date.now()-(lastReading||started)>6500){resetFinder('لم تصل بيانات الحركة');setSensorStatus(lastReading?'توقفت بيانات الحساس. اضغطي إعادة تشغيل ومعايرة.':'لم تصل بيانات الحركة. افتحي الرابط مباشرة في Safari واسمحي بالحركة، ثم اضغطي إعادة تشغيل ومعايرة.');}},1000);
+  }catch{if(session===sensorSession)setSensorStatus('تعذّر تشغيل الحساس. افتحي الرابط مباشرة في Safari ثم حاولي مرة أخرى.');}finally{if(session===sensorSession){permissionPending=false;$('enable-motion').disabled=false;}}
 }
 function onOrientation(event){
-  if(!sensors||![event.alpha,event.beta,event.gamma].every(Number.isFinite))return;
-  lastEvent={alpha:event.alpha,beta:event.beta,gamma:event.gamma};
-  let alpha=event.alpha;const hasCompass=Number.isFinite(event.webkitCompassHeading)&&event.webkitCompassHeading>=0;
-  if(manualOffset!==null)alpha=wrap(alpha+manualOffset);
-  else if(hasCompass){
-    const accuracy=Number.isFinite(event.webkitCompassAccuracy)?event.webkitCompassAccuracy:null;
-    if(accuracy!==null&&accuracy<0){setSensorStatus('البوصلة تحتاج معايرة. أبعدي الهاتف عن المغناطيس وحرّكيه على شكل 8.');return;}
-    compassAccuracy=accuracy;
-    const declination=magneticDeclination();if(declination===null){setSensorStatus('تعذّر تصحيح الشمال. استخدمي المعايرة اليدوية على الشمال الحقيقي من قسم المساعدة.');return;}
-    // Acquire Safari relative yaw against its independent magnetic compass while flat.
-    if(Math.abs(event.beta)<35&&Math.abs(event.gamma)<35){const m=rotationMatrix(alpha,event.beta,event.gamma);const rawHeading=wrap(Math.atan2(m[0][1],m[1][1])/DEG);yawOffset=angleDifference(rawHeading,wrap(event.webkitCompassHeading+declination));}
-    if(yawOffset===null){setSensorStatus('امسكي الآيفون مسطّحًا، والشاشة للأعلى، لثانية واحدة حتى نضبط اتجاه الشمال.');return;}
-    alpha=wrap(alpha+yawOffset);
-  }else if(event.absolute===true){previousAbsolute=Date.now();}
-  else {if(Date.now()-previousAbsolute<1500)return;setSensorStatus('الجهاز يرسل حركة دون اتجاه الشمال. استخدمي المعايرة اليدوية في قسم المساعدة.');return;}
-  lastSensor=Date.now();lastMatrix=rotationMatrix(alpha,event.beta,event.gamma);
+  if(!sensors)return;
+  const reading=tracker.read(event,magneticDeclination());
+  if(reading.state==='ignored'||reading.state==='missing')return;
+  lastReading=Date.now();
+  if(reading.state!=='ready'){
+    const messages={tilt:'ميّلي الهاتف قليلًا باتجاهكِ للحظة حتى تلتقط البوصلة الشمال، ثم وجّهي ظهره نحو السماء.',calibrate:'البوصلة تحتاج معايرة. أبعدي الهاتف عن المغناطيس وحرّكيه على شكل 8.',declination:'استخدمي زر معايرة الشمال أدناه لإكمال التوجيه.',relative:'وصلت حركة الهاتف. وجّهي ظهره نحو الشمال الحقيقي واضغطي معايرة الشمال أدناه.'};
+    resetFinder(reading.state==='tilt'?'ميّلي الهاتف قليلًا':'بانتظار اتجاه الشمال');setSensorStatus(messages[reading.state]);
+    $('north-calibration').hidden=!['relative','declination','calibrate'].includes(reading.state);
+    $('pointing-reading').textContent='وصلت قراءة الحركة · بانتظار ضبط البوصلة';return;
+  }
+  lastMatrix=reading.matrix;sensorReliable=reading.reliable;sensorManual=reading.manual;$('north-calibration').hidden=!reading.manual;
   if(!frame)frame=requestAnimationFrame(()=>{frame=null;if(sensors&&lastMatrix)updateFinder(lastMatrix);});
 }
 function updateFinder(matrix){
   if(!position)return;const screenAngle=screen.orientation?.angle??window.orientation??0;
   const target=targetInScreen(matrix,position.azimuth,position.altitude,screenAngle),phone=pointing(matrix);
-  $('finder-idle').hidden=true;const reliable=compassAccuracy===null||compassAccuracy<=20;
-  if(!reliable)setSensorStatus('دقة البوصلة ضعيفة. ابتعدي عن المعادن وحرّكي الجهاز على شكل 8 قبل الاعتماد على السهم.');else setSensorStatus(manualOffset!==null?'التوجيه يعمل بمعايرتكِ اليدوية. أعيدي المعايرة إذا تغيّر الاتجاه.':'التوجيه يعمل. وجّهي ظهر الآيفون نحو السماء وحرّكيه بهدوء.');
+  $('finder-idle').hidden=true;const reliable=sensorReliable;
+  if(!reliable)setSensorStatus('دقة البوصلة ضعيفة. ابتعدي عن المعادن وحرّكي الجهاز على شكل 8 قبل الاعتماد على السهم.');else setSensorStatus(sensorManual?'التوجيه يعمل بمعايرتكِ اليدوية. أعيدي المعايرة إذا تغيّر الاتجاه.':'التوجيه يعمل. وجّهي ظهر الآيفون نحو السماء وحرّكيه بهدوء.');
   const close=target.separation<6&&reliable&&position.altitude>0;
   $('finder').classList.toggle('aligned',close);
   const inView=target.forward>0&&Math.hypot(target.x,target.y)/target.forward<.7;
@@ -104,14 +109,15 @@ function updateFinder(matrix){
   $('pointing-reading').textContent=`اتجاه الهاتف ${formatDegree(phone.azimuth)} · ميله ${formatDegree(phone.altitude)} · توجيه تقريبي`;
 }
 $('enable-motion').addEventListener('click',enableSensors);
-$('calibrate-north').addEventListener('click',()=>{if(!sensors||!lastEvent){$('calibration-status').textContent='شغّلي التوجيه أولًا. المعايرة تحتاج قراءة حركة من الجهاز.';return;}const p=pointing(rotationMatrix(lastEvent.alpha,lastEvent.beta,lastEvent.gamma));if(Math.abs(p.altitude)>60){$('calibration-status').textContent='ارفعي الشاشة لتكون عمودية، ووجّهي ظهر الهاتف نحو الشمال الحقيقي.';return;}manualOffset=p.azimuth;compassAccuracy=null;$('calibration-status').textContent='تم اعتماد اتجاه ظهر الهاتف كشمال حقيقي. يمكنكِ الآن تتبّع النجمة.';});
+$('calibrate-north').addEventListener('click',()=>{const event=tracker.lastEvent;if(!sensors||!event||Date.now()-lastReading>6500){$('calibration-status').textContent='شغّلي التوجيه أولًا. المعايرة تحتاج قراءة حركة من الجهاز.';return;}const p=pointing(rotationMatrix(event.alpha,event.beta,event.gamma));if(Math.abs(p.altitude)>60){$('calibration-status').textContent='ارفعي الشاشة لتكون عمودية، ووجّهي ظهر الهاتف نحو الشمال الحقيقي.';return;}tracker.manualOffset=p.azimuth;$('calibration-status').textContent='تم اعتماد اتجاه ظهر الهاتف كشمال حقيقي. يمكنكِ الآن تتبّع النجمة.';onOrientation(event);});
 $('use-location').addEventListener('click',()=>{
   if(!navigator.geolocation){$('location-status').textContent='الموقع غير متاح؛ الحسابات مستمرة لعمّان.';return;}
   const request=++geoRequest;$('use-location').disabled=true;$('location-status').textContent='جارٍ تحديد موقعكِ…';
-  navigator.geolocation.getCurrentPosition(result=>{if(request!==geoRequest)return;const p=result.coords;location={lat:p.latitude,lon:p.longitude,height:0};yawOffset=null;$('location-label').textContent='موقعكِ الحالي';$('location-status').textContent=`تم استخدام موقعكِ. دقة التحديد نحو ${Math.round(p.accuracy)} مترًا. لا يُرسل الموقع لأي خادم.`;$('use-location').disabled=false;refresh();},()=>{if(request!==geoRequest)return;$('location-status').textContent='تعذّر تحديد موقعكِ أو لم يُسمح به. ما زلنا نستخدم الموقع السابق الظاهر أسفل الصفحة.';$('use-location').disabled=false;},{enableHighAccuracy:true,timeout:12000,maximumAge:60000});
+  navigator.geolocation.getCurrentPosition(result=>{if(request!==geoRequest)return;const oldDeclination=magneticDeclination(),p=result.coords;location={lat:p.latitude,lon:p.longitude,height:0};adjustDeclination(oldDeclination);$('location-label').textContent='موقعكِ الحالي';$('location-status').textContent=`تم استخدام موقعكِ. دقة التحديد نحو ${Math.round(p.accuracy)} مترًا. لا يُرسل الموقع لأي خادم.`;$('use-location').disabled=false;refresh();},()=>{if(request!==geoRequest)return;$('location-status').textContent='تعذّر تحديد موقعكِ أو لم يُسمح به. ما زلنا نستخدم الموقع السابق الظاهر أسفل الصفحة.';$('use-location').disabled=false;},{enableHighAccuracy:true,timeout:12000,maximumAge:60000});
 });
-$('reset-location').addEventListener('click',()=>{geoRequest++;location={...AMMAN};yawOffset=null;$('use-location').disabled=false;$('location-label').textContent='عمّان، الأردن · موقع تقريبي';$('location-status').textContent='نستخدم وسط عمّان كموقع تقريبي. موقعكِ الحالي يُحسب داخل جهازكِ.';refresh();});
-document.addEventListener('visibilitychange',()=>{if(document.hidden){if(sensors){stopSensors();setSensorStatus('اضغطي تشغيل التوجيه بعد العودة للصفحة.');}}else refresh();});
+function adjustDeclination(previous){const next=magneticDeclination();if(tracker.yawOffset!==null&&Number.isFinite(previous)&&Number.isFinite(next))tracker.yawOffset+=previous-next;}
+$('reset-location').addEventListener('click',()=>{geoRequest++;const previous=magneticDeclination();location={...AMMAN};adjustDeclination(previous);$('use-location').disabled=false;$('location-label').textContent='عمّان، الأردن · موقع تقريبي';$('location-status').textContent='نستخدم وسط عمّان كموقع تقريبي. موقعكِ الحالي يُحسب داخل جهازكِ.';refresh();});
+document.addEventListener('visibilitychange',()=>{if(document.hidden){resumeGuide=sensors;if(sensors){stopSensors();setSensorStatus('اضغطي تشغيل التوجيه بعد العودة للصفحة.');}}else{refresh();if(resumeGuide&&currentView==='guide')void enableSensors();}});
 window.addEventListener('pagehide',stopSensors);
 new ResizeObserver(()=>{if(currentView==='home')drawMap();}).observe($('sky-map'));
 refresh();setInterval(()=>{if(!document.hidden)refresh();},15000);
