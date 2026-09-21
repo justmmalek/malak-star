@@ -1,0 +1,28 @@
+name: Build Stellarium engine
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Get pinned official source
+        run: |
+          git clone https://github.com/Stellarium/stellarium-web-engine.git source
+          cd source
+          git checkout 29870744c470ddc62fa869e153178c82a7824fa4
+          python3 ../.github/patch-stellarium.py
+      - name: Compile WebAssembly
+        run: |
+          docker run --rm -v "$PWD/source:/work" -w /work emscripten/emsdk:2.0.11 bash -c 'source /emsdk/emsdk_env.sh && python3 -m pip install SCons==4.1.0.post1 && emscons scons -j4 mode=release werror=0 build/stellarium-web-engine.js'
+      - name: Upload engine
+        uses: actions/upload-artifact@v4
+        with:
+          name: stellarium-engine
+          path: |
+            source/build/stellarium-web-engine.js
+            source/build/stellarium-web-engine.wasm
+          if-no-files-found: error

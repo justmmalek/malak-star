@@ -4,3 +4,8 @@
 *.ttf binary
 *.mp3 binary
 *.m4a binary
+
+*.wasm binary
+*.eph binary
+*.webp binary
+*.tar.gz binary

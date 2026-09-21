@@ -6,12 +6,13 @@
   <title>نجمة ملك | Malak’s Star</title>
   <meta name="description" content="إلى ملك اليازوري، نجمة في السماء وحكاية من القلب.">
   <link rel="icon" href="assets/star.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="style.css?v=20260920-motion">
+  <link rel="stylesheet" href="style.css?v=20260921-sky">
+  <link rel="stylesheet" href="planetarium.css?v=20260921-sky">
   <script src="vendor/astronomy.browser.min.js" defer></script>
   <script src="vendor/geomagnetism.js" defer></script>
-  <script type="module" src="app.js?v=20260920-motion"></script>
+  <script type="module" src="app.js?v=20260921-sky"></script>
   <script src="audio-mixer.js?v=20260920-voice-balance2" defer></script>
-  <script src="music.js?v=20260920-motion" defer></script>
+  <script src="music.js?v=20260921-sky" defer></script>
   <script src="voice.js?v=20260920-voice" defer></script>
 </head>
 <body>
@@ -57,30 +58,36 @@
         <p id="map-error" class="notice" hidden></p>
       </div>
     </section>
-    <section id="guide-view" class="guide-layout" aria-labelledby="guide-title" hidden>
-      <div class="guide-copy">
-        <button class="back-link" data-view="home">← العودة لنجمتي</button>
-        <h1 id="guide-title">اتبعي نجمتكِ.</h1>
-        <p class="lead">وجّهي ظهر الآيفون نحو السماء، واتبعي السهم حتى تلتقي نجمتكِ بمنتصف الدائرة.</p>
-        <div class="guide-metrics"><div><span>اتجاه النجمة</span><strong id="guide-az">—</strong></div><div><span>فوق الأفق</span><strong id="guide-alt">—</strong></div></div>
-        <button id="enable-motion" class="gold-button">تشغيل التوجيه بالتلفون</button>
-        <p id="sensor-status" class="notice" role="status">اسمحي بالحركة عند الطلب، وحرّكي الهاتف بهدوء.</p>
-        <div id="north-calibration" class="north-calibration" hidden><button id="calibrate-north" class="outline-button">معايرة الشمال</button><p id="calibration-status" class="notice">اجعلي الشاشة عمودية ووجّهي ظهر الهاتف نحو الشمال الحقيقي، ثم اضغطي الزر.</p></div>
-        <div class="guide-actions"><button id="use-location" class="outline-button">استخدمي موقعي الحالي</button><button id="reset-location" class="text-button small">سماء عمّان</button></div>
-        <p id="location-status" class="muted">نستخدم وسط عمّان كموقع تقريبي. موقعكِ الحالي يُحسب داخل جهازكِ.</p>
-        <details class="help"><summary>إذا احتجتِ مساعدة</summary><p>افتحي الرابط مباشرة في Safari. اسمحي بالحركة عند الطلب. ابتعدي عن المعادن والمغناطيس وحرّكي الجهاز بشكل رقم 8 لمعايرة البوصلة.</p><p>إذا ظهرت «ميّلي الهاتف قليلًا»، ميّلي أعلى الهاتف نحوكِ للحظة، ثم وجّهي ظهره نحو السماء. تابعي السهم حتى تصل العلامة إلى منتصف الدائرة.</p></details>
+    <section id="guide-view" class="planetarium" aria-labelledby="guide-title" hidden>
+      <canvas id="sky-canvas" aria-label="خريطة السماء التفاعلية، اسحبي لتحريكها وكبّري بإصبعين" role="img"></canvas>
+      <div class="sky-topbar">
+        <button class="sky-icon" data-view="home" aria-label="العودة لنجمتي">✕</button>
+        <div><p id="sky-mode">استكشاف السماء</p><h1 id="guide-title">سماء ملك</h1></div>
+        <details id="sky-settings" class="sky-settings">
+          <summary class="sky-icon" aria-label="إعدادات خريطة السماء">☷</summary>
+          <div class="sky-settings-panel">
+            <h2>السماء من مكانكِ</h2>
+            <button id="use-location" class="outline-button">استخدمي موقعي الحالي</button>
+            <button id="reset-location" class="text-button small">سماء عمّان</button>
+            <p id="location-status" class="muted">نستخدم وسط عمّان. الموقع الحالي يُحسب داخل جهازكِ.</p>
+            <button id="sky-grid" class="outline-button" aria-pressed="false" data-sky-control disabled>خطوط الاتجاهات</button>
+            <p>اسحبي بإصبع واحد، وكبّري بإصبعين. زر «نجمتي» يعيدكِ إلى العلامة الذهبية.</p>
+            <p>للتتبّع: افتحي الموقع في Safari واسمحي بالحركة. امسكي الآيفون مسطّحًا لحظة ثم ارفعيه. أبعدي المغناطيس إذا انحرف الاتجاه.</p>
+            <p class="muted">خريطة إرشادية للوقت الحالي. إضاءة النهار مخفية لإظهار النجوم، والعلامة مكبّرة لتوضيح الموضع.</p>
+            <a href="sky-credits.html" target="_blank" rel="noopener">Stellarium · المصادر والترخيص ↗</a>
+          </div>
+        </details>
       </div>
-      <div class="finder-column">
-        <div id="finder" class="finder" role="img" aria-label="مؤشر توجيه الهاتف نحو النجمة">
-          <div class="finder-ring ring-two"></div><div class="finder-ring ring-three"></div><div class="crosshair"></div>
-          <span class="finder-north">نحو نجمتكِ</span>
-          <div id="target-dot" class="target-dot" hidden>✦<span>ملك</span></div>
-          <div id="direction-arrow" class="direction-arrow" hidden>↑</div>
-          <div id="finder-idle" class="finder-idle"><span>✦</span><p>نجمة ملك</p><small>شغّلي التوجيه لتبدئي</small></div>
-        </div>
-        <p id="direction-text" class="direction-text" role="status">اتبعي موقع نجمتكِ الآن.</p>
-        <p id="pointing-reading" class="muted" dir="rtl">حساب الموقع يتجدّد تلقائيًا</p>
-        <p id="guide-visibility" class="notice"></p>
+      <div class="sky-zoom"><button id="sky-zoom-in" class="sky-icon" aria-label="تكبير السماء" data-sky-control disabled>+</button><span id="sky-fov" dir="ltr">65°</span><button id="sky-zoom-out" class="sky-icon" aria-label="تصغير السماء" data-sky-control disabled>−</button></div>
+      <div id="sky-target" class="sky-target" hidden><i aria-hidden="true"></i><span>نجمة ملك</span></div>
+      <div id="sky-edge" class="sky-edge" hidden><i id="sky-edge-arrow" aria-hidden="true">↑</i><span>ملك</span></div>
+      <div id="sky-loading" class="sky-loading" role="status"><span aria-hidden="true">✦</span><p id="sky-load-text">عم نفتح سماءكِ…</p><button id="sky-retry" class="outline-button" hidden>إعادة المحاولة</button></div>
+      <div class="sky-bottom">
+        <p id="sky-offscreen" class="sky-offscreen" hidden>نجمتكِ خارج الشاشة · اضغطي «نجمتي» لإظهارها</p>
+        <p id="sensor-status" role="status">اسحبي السماء للتصفّح.</p>
+        <div class="sky-toolbar"><button id="sky-center" class="gold-button" data-sky-control disabled><span aria-hidden="true">✦</span> نجمتي</button><button id="enable-motion" class="outline-button" aria-pressed="false" data-sky-control disabled>تتبّع الهاتف</button></div>
+        <button id="sky-recalibrate" class="text-button small" hidden>إعادة معايرة البوصلة</button>
+        <div class="sky-readings"><span>السمت <b id="guide-az">—</b></span><span>الارتفاع <b id="guide-alt">—</b></span><time id="sky-clock"></time></div>
       </div>
     </section>
     <section id="certificate-view" class="certificate-view" aria-labelledby="certificate-title" hidden>
