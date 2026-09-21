@@ -1,0 +1,13 @@
+from pathlib import Path
+p = Path("src/js/canvas.js")
+s = p.read_text()
+s = s.replace("var dpr = window.devicePixelRatio || 1;", "var dpr = Math.min(window.devicePixelRatio || 1, 2);")
+s = s.replace("var displayWidth  = rect.width;", "if (!rect.width || !rect.height || document.hidden) { window.requestAnimationFrame(render); return; }\n    var displayWidth  = rect.width;")
+s = s.replace("canvas.width  !== displayWidth", "canvas.width  !== Math.round(displayWidth * dpr)").replace("canvas.height !== displayHeight", "canvas.height !== Math.round(displayHeight * dpr)")
+s = s.replace("canvas.width = displayWidth * dpr", "canvas.width = Math.round(displayWidth * dpr)").replace("canvas.height = displayHeight * dpr", "canvas.height = Math.round(displayHeight * dpr)")
+s = s.replace(".pageX - rect.left", ".clientX - rect.left").replace(".pageY - rect.top", ".clientY - rect.top")
+s = s.replace("Module._core_render(displayWidth, displayHeight, dpr);", "Module._core_render(displayWidth, displayHeight, dpr);\n    if (Module.onFrame) Module.onFrame();")
+p.write_text(s)
+p = Path("src/js/obj.js")
+s = p.read_text().replace("Module._free(type);", "Module._free(ctype);")
+p.write_text(s)
