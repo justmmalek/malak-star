@@ -12,3 +12,7 @@ body.sky-open{overflow:hidden}.sky-open>.site-header,.sky-open>.music,.sky-open>
 .sky-edge{position:absolute;pointer-events:none;transform:translate(-50%,-50%);color:#e8c88e;display:flex;flex-direction:column;align-items:center;text-shadow:0 2px 8px #000}.sky-edge i{display:block;font:32px/1 system-ui;font-style:normal}.sky-edge span{font:20px Amiri;margin-top:6px}
 @media(max-width:680px){.sky-topbar{padding-inline:18px;gap:13px}.sky-topbar h1{font-size:29px}.sky-zoom{left:15px}.sky-bottom{padding-inline:18px}.sky-toolbar button{min-width:0;flex:1;max-width:190px}.sky-readings{gap:14px}.sky-target>span{font-size:23px}}
 @media(max-height:480px){.sky-bottom{padding-top:20px;padding-bottom:10px}.sky-readings{margin-top:5px}.sky-topbar{padding-top:10px}.sky-bottom>p{margin-bottom:5px}.sky-toolbar button{padding:7px 16px}}
+
+.sky-position{margin:0 auto 16px;max-width:540px}.sky-position h2{font:30px/1.4 Amiri,serif;color:#f4e4c3;margin:0 0 5px}.sky-position p{font-size:13px;color:#bdc8d8;margin:0;line-height:1.8}.sky-toolbar button{min-width:180px}.sky-readings{margin-top:12px}
+@media(max-width:680px){.sky-position h2{font-size:26px}.sky-position p{font-size:12px}.sky-toolbar button{flex:0 1 190px}}
+@media(max-height:480px){.sky-position{margin-bottom:8px}.sky-position h2{font-size:23px}.sky-position p{font-size:11px}.sky-bottom{padding-top:12px}}

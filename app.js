@@ -1,8 +1,9 @@
 import {DEG,starVector,dedicatedStarPosition,DEDICATED_STAR} from './sky-math.mjs';
-import {Planetarium} from './planetarium.mjs?v=20260921-sky';
+import {Planetarium} from './planetarium.mjs?v=20260921-simple';
+import {describeSkyPosition} from './sky-description.mjs';
 const $=id=>document.getElementById(id);
 const A=window.Astronomy;
-const AMMAN={lat:31.9539,lon:35.9106,height:800};
+const AMMAN={lat:31.9539,lon:35.9106,height:800,label:'عمّان'};
 let location={...AMMAN},catalog=[],currentView='home',position=null,geoRequest=0;
 const planetarium=new Planetarium(()=>location);
 const formatDegree=n=>`${n.toFixed(1)}°`;
@@ -19,7 +20,7 @@ function showView(view){
 buttons.forEach(button=>button.addEventListener('click',()=>showView(button.dataset.view)));
 document.querySelector('.brand').addEventListener('click',event=>{event.preventDefault();showView('home');});
 $('start-guide').addEventListener('click',()=>{showView('guide');});
-function visibilityText(p){if(p.altitude<=0)return 'موضع نجمتكِ تحت الأفق الآن من هذا المكان.';if(p.sunAltitude>-6)return 'موضع نجمتكِ فوق الأفق الآن · السماء لم تُظلم بعد.';return 'موضع نجمتكِ فوق الأفق الآن.';}
+function visibilityText(p){const d=describeSkyPosition(p.azimuth,p.altitude);return `${d.heading} ${d.detail}`;}
 function refresh(){
   if(!A){$('visibility-home').textContent='تعذّر تحميل حسابات السماء. أعيدي فتح الصفحة.';return;}
   try{position=dedicatedStarPosition(new Date(),location,A);}catch(error){$('visibility-home').textContent='تعذّر حساب موقع النجمة. أعيدي المحاولة.';return;}
@@ -55,7 +56,7 @@ function drawMap(){
 $('use-location').addEventListener('click',()=>{
   if(!navigator.geolocation){$('location-status').textContent='الموقع غير متاح؛ الحسابات مستمرة لعمّان.';return;}
   const request=++geoRequest;$('use-location').disabled=true;$('location-status').textContent='جارٍ تحديد موقعكِ…';
-  navigator.geolocation.getCurrentPosition(result=>{if(request!==geoRequest)return;const p=result.coords;location={lat:p.latitude,lon:p.longitude,height:0};planetarium.updateObserver();$('location-label').textContent='موقعكِ الحالي';$('location-status').textContent=`تم استخدام موقعكِ. دقة التحديد نحو ${Math.round(p.accuracy)} مترًا. لا يُرسل الموقع لأي خادم.`;$('use-location').disabled=false;refresh();},()=>{if(request!==geoRequest)return;$('location-status').textContent='تعذّر تحديد موقعكِ أو لم يُسمح به. ما زلنا نستخدم الموقع السابق الظاهر أسفل الصفحة.';$('use-location').disabled=false;},{enableHighAccuracy:true,timeout:12000,maximumAge:60000});
+  navigator.geolocation.getCurrentPosition(result=>{if(request!==geoRequest)return;const p=result.coords;location={lat:p.latitude,lon:p.longitude,height:0,label:'موقعكِ الحالي'};planetarium.updateObserver();$('location-label').textContent='موقعكِ الحالي';$('location-status').textContent=`تم استخدام موقعكِ. دقة التحديد نحو ${Math.round(p.accuracy)} مترًا. لا يُرسل الموقع لأي خادم.`;$('use-location').disabled=false;refresh();},()=>{if(request!==geoRequest)return;$('location-status').textContent='تعذّر تحديد موقعكِ أو لم يُسمح به. ما زلنا نستخدم الموقع السابق الظاهر أسفل الصفحة.';$('use-location').disabled=false;},{enableHighAccuracy:true,timeout:12000,maximumAge:60000});
 });
 $('reset-location').addEventListener('click',()=>{geoRequest++;location={...AMMAN};planetarium.updateObserver();$('use-location').disabled=false;$('location-label').textContent='عمّان، الأردن · موقع تقريبي';$('location-status').textContent='نستخدم وسط عمّان كموقع تقريبي. موقعكِ الحالي يُحسب داخل جهازكِ.';refresh();});
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)refresh();});
