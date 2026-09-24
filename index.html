@@ -6,12 +6,11 @@
   <title>نجمة ملك | Malak’s Star</title>
   <meta name="description" content="إلى ملك اليازوري، نجمة في السماء وحكاية من القلب.">
   <link rel="icon" href="assets/star.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="style.css?v=20260921-simple">
-  <link rel="stylesheet" href="planetarium.css?v=20260921-simple">
+  <link rel="stylesheet" href="style.css?v=20260924-home-map">
   <script src="vendor/astronomy.browser.min.js" defer></script>
-  <script type="module" src="app.js?v=20260921-simple"></script>
+  <script type="module" src="app.js?v=20260924-home-map"></script>
   <script src="audio-mixer.js?v=20260920-voice-balance2" defer></script>
-  <script src="music.js?v=20260921-simple" defer></script>
+  <script src="music.js?v=20260924-home-map" defer></script>
   <script src="voice.js?v=20260920-voice" defer></script>
 </head>
 <body>
@@ -19,7 +18,6 @@
     <a class="brand" href="#" aria-label="نجمة ملك، الرئيسية"><span aria-hidden="true">✦</span> نجمة ملك</a>
     <nav aria-label="التنقل الرئيسي">
       <button class="nav-link active" data-view="home" aria-current="page">نجمتي</button>
-      <button class="nav-link" data-view="guide">خريطة السماء</button>
       <button class="nav-link" data-view="certificate">الشهادة</button>
     </nav>
   </header>
@@ -46,44 +44,14 @@
     <p id="voice-status" class="sr-only" role="status"></p>
     <noscript><audio controls src="assets/voice-from-malek.m4a" aria-label="رسالة مالك الصوتية"></audio></noscript>
   </aside>
-        <div class="star-details"><h2>نجمة ملك</h2><span class="latin" lang="en">With love, from Malek</span><p class="coordinates" dir="ltr">15h 23m 41.2s<br>+67° 11′ 09″</p></div>
-        <button class="gold-button" id="start-guide"><span aria-hidden="true">✧</span> شوفي مكان نجمتكِ</button>
         <button class="text-button" data-view="certificate">شهادتكِ</button>
-        <p id="visibility-home" class="visibility">جارٍ حساب موقع نجمتك…</p>
       </div>
       <div class="atlas-column">
+        <p class="map-kicker"><span aria-hidden="true">✦</span> مكان نجمتكِ الآن · سماء عمّان</p>
         <div class="atlas-frame"><canvas id="sky-map" aria-label="خريطة السماء الآن، مع تمييز نجمة ملك" role="img"></canvas></div>
-        <p class="map-caption">السماء فوقكِ الآن <span>·</span> الوسط فوق رأسكِ، والدائرة هي الأفق<br>علامة نجمتكِ مكبّرة لتوضيح مكانها.</p>
+        <div class="map-position" role="status"><h2 id="visibility-home">عم نحدّد مكان نجمتكِ…</h2><p id="position-hint"></p></div>
+        <p class="map-caption">وسط الدائرة فوق راسكِ، وحافتها خط الأفق.</p>
         <p id="map-error" class="notice" hidden></p>
-      </div>
-    </section>
-    <section id="guide-view" class="planetarium" aria-labelledby="guide-title" hidden>
-      <canvas id="sky-canvas" aria-label="خريطة السماء التفاعلية، اسحبي لتحريكها وكبّري بإصبعين" role="img"></canvas>
-      <div class="sky-topbar">
-        <button class="sky-icon" data-view="home" aria-label="العودة لنجمتي">✕</button>
-        <div><p id="sky-mode">نجمتكِ الآن</p><h1 id="guide-title">سماء ملك</h1></div>
-        <details id="sky-settings" class="sky-settings">
-          <summary class="sky-icon" aria-label="إعدادات خريطة السماء">☷</summary>
-          <div class="sky-settings-panel">
-            <h2>السماء من مكانكِ</h2>
-            <button id="use-location" class="outline-button">استخدمي موقعي الحالي</button>
-            <button id="reset-location" class="text-button small">سماء عمّان</button>
-            <p id="location-status" class="muted">نستخدم وسط عمّان. الموقع الحالي يُحسب داخل جهازكِ.</p>
-            <p>اسحبي بإصبع واحد، وكبّري بإصبعين. زر «نجمتي» يعيدكِ إلى العلامة الذهبية.</p>
-            <p class="muted">خريطة إرشادية للوقت الحالي. إضاءة النهار مخفية لإظهار النجوم، والعلامة مكبّرة لتوضيح الموضع.</p>
-            <a href="sky-credits.html" target="_blank" rel="noopener">Stellarium · المصادر والترخيص ↗</a>
-          </div>
-        </details>
-      </div>
-      <div class="sky-zoom"><button id="sky-zoom-in" class="sky-icon" aria-label="تكبير السماء" data-sky-control disabled>+</button><span id="sky-fov" dir="ltr">65°</span><button id="sky-zoom-out" class="sky-icon" aria-label="تصغير السماء" data-sky-control disabled>−</button></div>
-      <div id="sky-target" class="sky-target" hidden><i aria-hidden="true"></i><span>نجمة ملك</span></div>
-      <div id="sky-edge" class="sky-edge" hidden><i id="sky-edge-arrow" aria-hidden="true">↑</i><span>ملك</span></div>
-      <div id="sky-loading" class="sky-loading" role="status"><span aria-hidden="true">✦</span><p id="sky-load-text">عم نفتح سماءكِ…</p><button id="sky-retry" class="outline-button" hidden>إعادة المحاولة</button></div>
-      <div class="sky-bottom">
-        <p id="sky-offscreen" class="sky-offscreen" hidden>نجمتكِ خارج الشاشة · اضغطي «نجمتي» لإظهارها</p>
-        <div class="sky-position" role="status"><h2 id="sky-position-title">جارٍ تحديد مكان نجمتكِ…</h2><p id="sky-position-detail"></p></div>
-        <div class="sky-toolbar"><button id="sky-center" class="gold-button" data-sky-control disabled><span aria-hidden="true">✦</span> نجمتي</button></div>
-        <div class="sky-readings"><span id="sky-location">عمّان</span><span>الآن · <time id="sky-clock"></time></span></div>
       </div>
     </section>
     <section id="certificate-view" class="certificate-view" aria-labelledby="certificate-title" hidden>
@@ -93,6 +61,6 @@
     </section>
     <noscript><p class="notice">فعّلي JavaScript لعرض خريطة السماء. <a href="assets/Malak-Alyazuri-Star-Certificate.pdf">شهادة ملك متاحة هنا.</a></p></noscript>
   </main>
-  <footer class="status-bar"><div class="status-facts"><span id="location-label">عمّان، الأردن · موقع تقريبي</span><span>السمت <b id="azimuth">—</b></span><span>الارتفاع <b id="altitude">—</b></span></div><time id="live-time"></time></footer>
+  <footer class="status-bar"><span>سماء عمّان · بتتحدّث تلقائيًا</span><time id="live-time"></time></footer>
 </body>
 </html>

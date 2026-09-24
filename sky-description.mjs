@@ -1,12 +1,10 @@
 const directions=['الشمال','الشمال الشرقي','الشرق','الجنوب الشرقي','الجنوب','الجنوب الغربي','الغرب','الشمال الغربي'];
-const number=new Intl.NumberFormat('ar-JO',{maximumFractionDigits:0});
 
 export function describeSkyPosition(azimuth,altitude){
   const az=((azimuth%360)+360)%360;
   const direction=directions[Math.round(az/45)%8];
-  const degrees=number.format(Math.abs(altitude));
-  if(altitude<0)return {heading:'نجمتكِ تحت الأفق الآن.',detail:`باتجاه ${direction}، حوالي ${degrees}° تحت الأفق.`};
-  if(altitude>=80)return {heading:'نجمتكِ قريبة من فوق رأسكِ الآن.',detail:`ارتفاعها حوالي ${degrees}° فوق الأفق.`};
-  const height=altitude<15?'قريبة من الأفق':altitude>=65?'عالية في السماء':'مرتفعة في السماء';
-  return {heading:`نجمتكِ الآن باتجاه ${direction}.`,detail:`${height}، حوالي ${degrees}° فوق الأفق.`};
+  if(altitude<0)return {heading:'نجمتكِ تحت الأفق هسا.',detail:`مكانها باتجاه ${direction}، تحت خط الأفق.`};
+  if(altitude>=80)return {heading:'نجمتكِ قريبة من فوق راسكِ.',detail:'عالية بالسما، تقريبًا فوقكِ مباشرة.'};
+  const detail=altitude<15?'قريبة من خط الأفق؛ ارفعي نظرك شوي.':altitude<35?'فوق الأفق بشوي.':altitude<60?'تقريبًا بنص المسافة بين الأفق وفوق راسكِ.':'عالية بالسما؛ ارفعي نظرك لفوق.';
+  return {heading:`نجمتكِ هسا جهة ${direction}.`,detail};
 }

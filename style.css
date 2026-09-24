@@ -13,3 +13,9 @@
 #music-status:empty{display:none}
 
 .north-calibration{margin:12px 0;padding:12px;border:1px solid var(--line);border-radius:5px}.north-calibration p{margin-bottom:0}@media(max-width:680px){.guide-copy>.north-calibration{order:4;width:100%;margin:0}}
+
+/* A single, automatic sky map on the home page. */
+.home-layout{grid-template-columns:minmax(280px,.9fr) minmax(360px,1.3fr);gap:5vw;min-height:calc(100svh - 245px)}
+.atlas-frame{max-width:590px;max-height:590px}.map-kicker{direction:rtl;text-align:center;color:#bdcce0;font-size:14px;margin:0 0 4px}.map-kicker span{color:var(--gold);margin-left:7px}
+.map-position{direction:rtl;text-align:center;margin:8px 0 14px}.map-position h2{font:32px/1.35 Amiri,serif;font-weight:400;color:#f0d49e;margin:0 0 8px}.map-position p{font-size:14px;color:#bdcce0;line-height:1.9;margin:0}.map-caption{font-size:12px;color:#8da0ba}.status-bar{font-size:12px;min-height:55px}
+@media(max-width:680px){.home-layout{display:flex;padding-top:22px;gap:0}.atlas-column{margin:22px 0 5px}.atlas-frame{max-width:390px}.map-kicker{font-size:12px}.map-position{margin:5px 0 12px}.map-position h2{font-size:28px}.map-position p{font-size:13px}.map-caption{font-size:11px}.dedication>.text-button{margin:14px auto 4px}.status-bar{margin-top:10px;padding:14px 6%}.dedication h1{font-size:44px}.site-header nav{gap:38px}}
