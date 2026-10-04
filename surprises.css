@@ -1,0 +1,36 @@
+.music-toggle{display:grid;place-items:center;width:44px;height:44px;flex:none;padding:0;border:1px solid #786846;border-radius:50%;background:transparent;color:var(--gold);font-family:system-ui,sans-serif;font-size:16px;line-height:1}
+.music-toggle:hover{background:#d4b77c12}
+.surprise-launchers{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:0 0 18px;width:100%}
+.surprise-card{display:flex;align-items:center;gap:10px;min-height:88px;padding:14px 12px;border:1px solid #3e3549;border-radius:12px;background:linear-gradient(145deg,#211e30,#101a2a);color:#f2e4e9;text-align:right;line-height:1.7;font-size:14px;transition:border-color .2s,transform .2s}
+.surprise-card:hover{border-color:#d99cac;transform:translateY(-2px)}
+.surprise-card small{display:block;color:#b7a5b2;font-size:11px;font-weight:400}
+.surprise-symbol{font-family:Georgia,serif;font-size:32px;color:#e6a7bc;line-height:1}
+.surprise-card:nth-child(2){border-color:#4b4232;background:linear-gradient(145deg,#252335,#101a2a)}
+.surprise-card:nth-child(2) .surprise-symbol{font-size:27px;color:var(--gold)}
+.surprise-arrow{margin-right:auto;color:#a99aa8;font-size:16px}
+.surprise-open{position:fixed;left:0;right:0;overflow:hidden}
+.surprise-dialog{width:min(480px,calc(100% - 32px));max-height:calc(100dvh - 32px);max-height:calc(100svh - 32px);overflow:auto;margin:auto;padding:52px 28px 30px;border:1px solid #695466;border-radius:24px;background:radial-gradient(ellipse at top,#302039 0%,#151b2b 65%);color:var(--text);box-shadow:0 25px 90px #0008;text-align:center}
+.surprise-dialog::backdrop{background:#030916c9;backdrop-filter:blur(6px)}
+.surprise-close{position:absolute;top:12px;left:12px;display:grid;place-items:center;width:44px;height:44px;border:1px solid #5a4d64;border-radius:50%;background:#151b2b;color:#e3cfdc;font-size:28px;line-height:1}
+.surprise-eyebrow{color:#d9a9bc;font-size:12px;margin:0 0 12px}
+.surprise-dialog h2{font-family:Amiri,serif;font-size:34px;font-weight:400;line-height:1.4;margin:0 0 12px}
+.surprise-instruction{color:#c4b7c6;font-size:13px;margin:0 auto 20px;max-width:310px}
+.heart-field{display:flex;flex-wrap:wrap;justify-content:center;gap:14px;max-width:290px;margin:26px auto 18px;direction:rtl}
+.collect-heart{display:grid;place-items:center;width:76px;height:76px;padding:0;border:1px solid #865a71;border-radius:50%;color:#f2adc8;background:radial-gradient(circle,#623e56,#302438);font-family:Georgia,serif;font-size:39px;line-height:1;transition:transform .18s,background .18s}
+.collect-heart:hover{transform:scale(1.07)}
+.collect-heart.collected{color:#e6c582;background:#252534;border-color:#756446;font-size:30px;cursor:default}
+.heart-progress{font-size:13px;color:#c7afc0;margin:16px 0 0;font-variant-numeric:tabular-nums}
+.reveal-heart{display:block;margin:4px auto;color:#eeadc6;font-size:80px;line-height:1.3;animation:heart-arrive .6s ease-out}
+.heart-reveal h3{font:48px/1.4 Amiri,serif;color:#f5c6d8;margin:4px 0 12px}
+.heart-reveal h3:focus{outline:none}
+.heart-reveal p{color:#d0b8c7;font-size:15px;margin-bottom:24px}
+.surprise-dialog .outline-button{border-radius:100px;border-color:#695466;color:#eac7d5;min-height:46px;padding-inline:23px}
+.note-star{display:block;width:138px;height:138px;margin:14px auto 10px;padding:0;border:1px solid #8a7456;border-radius:50%;background:radial-gradient(circle,#79613b66,#d4b77c05 70%);color:#f5d999;font-size:94px;line-height:1;text-shadow:0 0 35px #e9be6680;transition:transform .2s}
+.note-star:hover{transform:rotate(12deg) scale(1.04)}
+.note-star:active{transform:scale(.95)}
+.star-note{display:flex;align-items:center;justify-content:center;min-height:118px;margin:8px 0 18px;font:27px/1.65 Amiri,serif;color:#f1ddc2}
+@keyframes heart-arrive{from{opacity:0;transform:scale(.7)}to{opacity:1;transform:scale(1)}}
+@media(max-width:950px){.surprise-launchers{gap:8px}.surprise-card{padding:12px 9px;gap:8px;font-size:13px}.surprise-arrow{display:none}}
+@media(max-width:680px){.surprise-launchers{order:2;max-width:390px;margin:10px 0 0;gap:10px}.surprise-card{min-height:80px;font-size:13px;padding:12px 10px}.surprise-dialog{padding:58px 20px 28px}.surprise-dialog h2{font-size:30px}.heart-reveal h3{font-size:43px}.star-note{font-size:26px}}
+@media(max-width:360px){.surprise-card{font-size:12px;gap:7px}.surprise-symbol{font-size:26px}.surprise-card small{font-size:10px}.collect-heart{width:66px;height:66px}.heart-field{max-width:240px}}
+@media(prefers-reduced-motion:reduce){.surprise-dialog *{animation:none!important;transition:none!important}}

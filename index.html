@@ -7,11 +7,13 @@
   <meta name="description" content="إلى ملك اليازوري، نجمة في السماء وحكاية من القلب.">
   <link rel="icon" href="assets/star.svg" type="image/svg+xml">
   <link rel="stylesheet" href="style.css?v=20260924-home-map">
+  <link rel="stylesheet" href="surprises.css?v=20261005">
   <script src="vendor/astronomy.browser.min.js" defer></script>
   <script type="module" src="app.js?v=20260924-home-map"></script>
   <script src="audio-mixer.js?v=20260920-voice-balance2" defer></script>
-  <script src="music.js?v=20260924-home-map" defer></script>
+  <script src="music.js?v=20261005" defer></script>
   <script src="voice.js?v=20260920-voice" defer></script>
+  <script src="surprises.js?v=20261005" defer></script>
 </head>
 <body>
   <header class="site-header">
@@ -21,13 +23,13 @@
       <button class="nav-link" data-view="certificate">الشهادة</button>
     </nav>
   </header>
-  <aside class="music" aria-label="أغنيتنا">
+  <aside class="music" aria-label="الموسيقى">
     <div class="music-bar">
       <span class="music-track"><span aria-hidden="true">♫</span> <bdi lang="en">her · JVKE</bdi></span>
-      <button id="music-toggle" class="outline-button" aria-pressed="false" aria-controls="background-music" hidden>شغّلي أغنيتنا</button>
+      <button id="music-toggle" class="music-toggle" aria-label="تشغيل الموسيقى" aria-pressed="false" aria-controls="background-music" hidden><span id="music-icon" aria-hidden="true">▶</span></button>
     </div>
     <audio id="background-music" src="assets/her-jvke.mp3" autoplay loop playsinline preload="auto" controls aria-label="her — JVKE"></audio>
-    <p id="music-status" class="music-hint" role="status"></p>
+    <p id="music-status" class="sr-only" role="status"></p>
   </aside>
   <main>
     <section id="home-view" class="home-layout" aria-label="نجمة ملك في السماء">
@@ -44,6 +46,10 @@
     <p id="voice-status" class="sr-only" role="status"></p>
     <noscript><audio controls src="assets/voice-from-malek.m4a" aria-label="رسالة مالك الصوتية"></audio></noscript>
   </aside>
+        <div class="surprise-launchers" aria-label="مفاجآت إلكِ" hidden>
+          <button class="surprise-card" data-surprise="hearts" aria-haspopup="dialog"><span class="surprise-symbol" aria-hidden="true">♡</span><span>لعبة القلوب<small>خبّيتلك كلمة</small></span><span class="surprise-arrow" aria-hidden="true">↗</span></button>
+          <button class="surprise-card" data-surprise="notes" aria-haspopup="dialog"><span class="surprise-symbol" aria-hidden="true">✦</span><span>رسالة من نجمتكِ<small>اكبسي وشوفي</small></span><span class="surprise-arrow" aria-hidden="true">↗</span></button>
+        </div>
         <button class="text-button" data-view="certificate">شهادتكِ</button>
       </div>
       <div class="atlas-column">
@@ -61,6 +67,29 @@
     </section>
     <noscript><p class="notice">فعّلي JavaScript لعرض خريطة السماء. <a href="assets/Malak-Alyazuri-Star-Certificate.pdf">شهادة ملك متاحة هنا.</a></p></noscript>
   </main>
+  <dialog id="surprise-dialog" class="surprise-dialog" aria-labelledby="surprise-title">
+    <button class="surprise-close" aria-label="إغلاق المفاجأة" autofocus>×</button>
+    <div id="heart-surprise" hidden>
+      <p class="surprise-eyebrow">إلكِ إنتِ وبس</p>
+      <h2 id="surprise-title">خبّيتلك كلمة بين القلوب</h2>
+      <p class="surprise-instruction">اكبسي على القلوب الخمسة، وشوفي شو مخبّي.</p>
+      <div id="heart-field" class="heart-field" aria-label="القلوب الخمسة"></div>
+      <p id="heart-progress" class="heart-progress" role="status"></p>
+      <div id="heart-reveal" class="heart-reveal" hidden>
+        <span class="reveal-heart" aria-hidden="true">♥</span>
+        <h3 tabindex="-1">بحبك يا ملك</h3>
+        <p>كل هالقلوب إلكِ… وقلبي أولهم.</p>
+        <button id="heart-replay" class="outline-button">نلعب كمان مرة؟</button>
+      </div>
+    </div>
+    <div id="note-surprise" hidden>
+      <p class="surprise-eyebrow">من مالك إلكِ</p>
+      <h2 id="note-title">نجمتكِ معها رسالة</h2>
+      <button id="note-star" class="note-star" aria-label="افتحي رسالة من نجمتكِ"><span aria-hidden="true">✦</span></button>
+      <p id="star-note" class="star-note" aria-live="polite" aria-atomic="true">اكبسي عالنجمة ✦</p>
+      <button id="next-note" class="outline-button" hidden>رسالة كمان ✦</button>
+    </div>
+  </dialog>
   <footer class="status-bar"><span>سماء عمّان · بتتحدّث تلقائيًا</span><time id="live-time"></time></footer>
 </body>
 </html>

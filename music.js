@@ -10,7 +10,8 @@
 
   function syncButton() {
     const active = !audio.paused || pending;
-    toggle.textContent = active ? 'إيقاف الموسيقى' : 'شغّلي أغنيتنا';
+    document.getElementById('music-icon').textContent = active ? 'Ⅱ' : '▶';
+    toggle.setAttribute('aria-label', active ? 'إيقاف الموسيقى' : 'تشغيل الموسيقى');
     toggle.setAttribute('aria-pressed', String(active));
   }
 
@@ -22,7 +23,7 @@
     wantsPlayback = true;
     const id = ++requestId;
     pending = true;
-    status.textContent = 'جارٍ تشغيل أغنيتنا…';
+    status.textContent = '';
     syncButton();
     try {
       // Call synchronously from a trusted gesture when autoplay is blocked.
@@ -32,7 +33,7 @@
       pending = false;
       status.textContent = error.name === 'NotAllowedError'
         ? ''
-        : 'ما قدرنا نشغّل الأغنية. اضغطي التشغيل للمحاولة.';
+        : 'تعذّر تشغيل الموسيقى. يمكنكِ المحاولة من زر التشغيل.';
       syncButton();
     }
   }
@@ -43,7 +44,7 @@
     pending = false;
     removeGestureStart();
     audio.pause();
-    status.textContent = 'الموسيقى متوقفة';
+    status.textContent = '';
     syncButton();
   }
 
@@ -68,12 +69,12 @@
   });
   audio.addEventListener('pause', () => {
     pending = false;
-    status.textContent = 'الموسيقى متوقفة';
+    status.textContent = '';
     syncButton();
     if ('mediaSession' in navigator) navigator.mediaSession.playbackState = 'paused';
   });
   audio.addEventListener('waiting', () => {
-    if (wantsPlayback) status.textContent = 'جارٍ تحميل الأغنية…';
+    if (wantsPlayback) status.textContent = '';
   });
   audio.addEventListener('error', () => {
     pending = false;
