@@ -1,4 +1,4 @@
-import {GOALS,getGiftState,hitGiftBricks,completeBreaker,swapGiftPieces,replayGiftGame} from './gift-state.mjs?v=20261005-heart';
+import {GOALS,getGiftState,hitGiftBricks,completeBreaker,swapGiftPieces,replayGiftGame} from './gift-state.mjs?v=20261005-heart50';
 import {mountBreaker} from './star-breaker-view.mjs?v=20261005-challenge';
 import {WIDTH,HEIGHT,HEART_TARGET} from './star-breaker-model.mjs?v=20261005-challenge';
 import {PUZZLE_COLUMNS,PUZZLE_ROWS,heartPieceRect,isPiecePlaced} from './heart-puzzle.mjs?v=20261005-fit';

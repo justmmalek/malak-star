@@ -9,13 +9,13 @@
   <link rel="stylesheet" href="style.css?v=20260924-home-map">
   <link rel="stylesheet" href="surprises.css?v=20261005-journey">
   <script src="vendor/astronomy.browser.min.js" defer></script>
-  <script type="module" src="app.js?v=20261005-heart"></script>
+  <script type="module" src="app.js?v=20261005-heart50"></script>
   <script src="audio-mixer.js?v=20261005-continuous" defer></script>
   <script src="music.js?v=20261005-continuous" defer></script>
   <script src="voice.js?v=20261005-challenge" defer></script>
   <script src="surprises.js?v=20261005-journey" defer></script>
   <link rel="stylesheet" href="star-play.css?v=20261005-touch">
-  <link rel="stylesheet" href="gift-flow.css?v=20261005-heart">
+  <link rel="stylesheet" href="gift-flow.css?v=20261005-heart50">
   <link rel="stylesheet" href="star-breaker.css?v=20261005-fit">
 </head>
 <body class="gift-locked">
@@ -54,14 +54,14 @@
       </ol>
       <button id="gate-continue" class="gift-primary" disabled>ابدئي</button>
       <section id="gift-heart" class="gift-heart" aria-label="قلب المفاجأة" hidden>
-        <p class="heart-prompt">اكبسي عالقلب ١٠ مرات</p>
+        <p class="heart-prompt">اكبسي عالقلب ٥٠ مرة</p>
         <div class="heart-tap-stage">
           <div class="heart-halo" aria-hidden="true"></div>
           <button id="gift-heart-tap" class="gift-heart-tap" aria-label="اكبسي عالقلب" aria-describedby="heart-tap-count">
             <span class="heart-grow"><svg viewBox="0 0 120 112" aria-hidden="true" focusable="false"><defs><linearGradient id="gift-heart-fill" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#ffc6db"/><stop offset=".45" stop-color="#f070a6"/><stop offset="1" stop-color="#ab366c"/></linearGradient></defs><path fill="url(#gift-heart-fill)" stroke="#ffd4e7" stroke-width="1" d="M60 104C50 96 5 65 5 35C5 4 43-5 60 23C77-5 115 4 115 35C115 65 70 96 60 104Z"/><path d="M18 33C19 17 37 13 47 25" fill="none" stroke="#fff0f6" stroke-opacity=".6" stroke-width="4" stroke-linecap="round"/></svg></span>
           </button>
         </div>
-        <p id="heart-tap-count" class="heart-tap-count" dir="ltr" role="status" aria-live="polite">٠ / ١٠</p>
+        <p id="heart-tap-count" class="heart-tap-count" role="status" aria-live="polite">٠ من ٥٠</p>
         <div class="heart-tap-dots" aria-hidden="true"></div>
       </section>
       <button id="intro-back" class="reset-gift">رجوع</button>

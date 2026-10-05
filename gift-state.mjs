@@ -1,7 +1,7 @@
 import {PUZZLE_SIZE,shuffleHeart,correctPieces,isPiecePlaced,swapPieces} from './heart-puzzle.mjs?v=20261005-fit';
 import {TOTAL_BRICKS} from './star-breaker-model.mjs?v=20261005-challenge';
 export const GOALS={connect:PUZZLE_SIZE,chase:TOTAL_BRICKS};
-export const HEART_TAPS=10;
+export const HEART_TAPS=50;
 const STORAGE='malak-gift-journey-v4';
 const fresh=()=>{const board=shuffleHeart();return {version:6,heartFound:false,bricks:[],board,puzzleMoves:0,connect:correctPieces(board),chase:0,completed:{connect:false,chase:false},heartTaps:0,unlocked:false,entered:false};};
 // Keep progress only for the current visit, never restore a previous visit.
