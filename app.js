@@ -1,7 +1,8 @@
 import {DEG,starVector,dedicatedStarPosition} from './sky-math.mjs';
 import {describeSkyPosition} from './sky-description.mjs?v=20260924-home-map';
-import {getGiftState,nextGiftGame,resolveGiftView,subscribeGift,unlockGift,enterGift,resetGift} from './gift-state.mjs?v=20261005-fit';
-import {openGiftGame} from './gift-games.mjs?v=20261005-fit';
+import {getGiftState,nextGiftGame,resolveGiftView,subscribeGift,enterGift,resetGift} from './gift-state.mjs?v=20261005-heart';
+import {openGiftGame} from './gift-games.mjs?v=20261005-heart';
+import {mountGiftHeart} from './gift-heart.mjs?v=20261005-heart';
 const $=id=>document.getElementById(id);
 const A=window.Astronomy;
 const AMMAN={lat:31.9539,lon:35.9106,height:800,label:'عمّان'};
@@ -9,6 +10,7 @@ const location=AMMAN;
 let catalog=[],currentView='gate',position=null;
 let introSeen=false,giftSeen=false;
 const buttons=[...document.querySelectorAll('[data-view]')];
+const giftHeart=mountGiftHeart($('gift-heart'),$('gift-heart-burst'));
 function showView(view){
   const state=getGiftState();
   view=resolveGiftView(state,{introSeen,giftSeen},view);
@@ -33,12 +35,18 @@ function updateGate(){
     const step=$(`gate-step-${mode}`),complete=state.completed[mode];
     step.classList.toggle('step-done',complete);step.classList.toggle('step-current',next===mode);
     step.querySelector('.step-check').textContent=complete?'✓':'';
-    $(`${mode}-step-status`).textContent=complete?'✓':mode==='connect'?'١ / ٢':'٢ / ٢';
+    const title=mode==='connect'?'تركيب قلب مالك':'الوصول لقلب مالك';
+    $(`${mode}-step-title`).textContent=complete?`تم ${title}`:title;
+    $(`${mode}-step-status`).textContent=complete?'':mode==='connect'?'١ / ٢':'٢ / ٢';
   }
+  $('gift-gate').classList.toggle('games-complete',!next);
+  giftHeart.update(state);
+  $('gate-continue').hidden=!next;
   $('gate-continue').disabled=false;
-  $('gate-continue').textContent=next?((next==='connect'?state.puzzleMoves:state[next])>0?'كمّلي':next==='connect'?'ابدئي':'التالي'):'المفاجأة';
+  $('gate-continue').textContent=next?((next==='connect'?state.puzzleMoves:state[next])>0?'كمّلي':next==='connect'?'ابدئي':'الوصول لقلب مالك'):'';
 }
-$('gate-continue').addEventListener('click',()=>{const next=nextGiftGame();if(next)openGiftGame(next,$('gate-continue'));else unlockGift();});
+$('gate-continue').addEventListener('click',()=>{const next=nextGiftGame();if(next)openGiftGame(next,$('gate-continue'));});
+document.addEventListener('gift:game-return',()=>{showView('gate');$('gate-title').focus({preventScroll:true});});
 $('intro-continue').addEventListener('click',()=>{introSeen=true;showView('gate');$('gate-title').focus({preventScroll:true});});
 $('intro-back').addEventListener('click',()=>{introSeen=false;showView('intro');$('intro-title').focus({preventScroll:true});});
 $('show-gift').addEventListener('click',()=>{giftSeen=true;showView('certificate');$('certificate-title').focus({preventScroll:true});});

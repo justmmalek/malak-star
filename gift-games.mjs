@@ -1,10 +1,10 @@
-import {GOALS,getGiftState,hitGiftBricks,completeBreaker,swapGiftPieces,replayGiftGame,unlockGift} from './gift-state.mjs?v=20261005-fit';
+import {GOALS,getGiftState,hitGiftBricks,completeBreaker,swapGiftPieces,replayGiftGame} from './gift-state.mjs?v=20261005-heart';
 import {mountBreaker} from './star-breaker-view.mjs?v=20261005-challenge';
 import {WIDTH,HEIGHT,HEART_TARGET} from './star-breaker-model.mjs?v=20261005-challenge';
 import {PUZZLE_COLUMNS,PUZZLE_ROWS,heartPieceRect,isPiecePlaced} from './heart-puzzle.mjs?v=20261005-fit';
 const dialog=document.getElementById('journey-dialog');
 let mode='connect',guided=true,opener=null,scrollY=0,pointer=null;
-let selected=null,dragStart=null,dragging=false,hintPointer=null,hintKey=null,celebrationTimer=0;
+let selected=null,dragStart=null,dragging=false,hintPointer=null,hintKey=null,celebrationTimer=0,returnTimer=0;
 const ar=n=>n.toLocaleString('ar-JO');
 const done=()=>mode==='connect'?getGiftState().connect===GOALS.connect:getGiftState().heartFound;
 
@@ -49,7 +49,10 @@ function choosePiece(index){
   if(selected===null){selected=index;renderPuzzle();return;}
   if(selected===index){selected=null;renderPuzzle();return;}
   swapGiftPieces(selected,index);selected=null;update();
-  if(done())(guided?next:replay).focus({preventScroll:true});
+  if(done()){
+    (guided?next:replay).focus({preventScroll:true});
+    if(guided)returnTimer=setTimeout(()=>{if(dialog.open&&mode==='connect'&&done())dialog.close();},1800);
+  }
 }
 function cellAt(point){
   const rect=board.getBoundingClientRect(),x=point.x-rect.left,y=point.y-rect.top;
@@ -79,7 +82,7 @@ function celebrate(){
   }
   celebrationTimer=setTimeout(()=>{
     clearCelebration();
-    if(guided&&mode==='chase'&&done()&&dialog.open){dialog.close();unlockGift();}
+    if(guided&&mode==='chase'&&done()&&dialog.open)dialog.close();
   },reduced?2500:6000);
 }
 function updateProgress(){
@@ -102,10 +105,10 @@ function update(){
   if(puzzle)renderPuzzle();
   stage.hidden=puzzle;controls.hidden=puzzle||complete;result.hidden=puzzle||!complete;replay.hidden=!complete||guided;next.hidden=!complete||!guided;
   dialog.querySelector('#play-result-title').textContent='بحبككككككككككككك';
-  next.textContent=puzzle?'التالي':'المفاجأة';updateProgress();resize();
+  next.textContent='رجوع للألعاب';updateProgress();resize();
 }
 function startMode(){
-  breaker.deactivate();clearCelebration();selected=null;clearDrag();pointer=null;
+  breaker.deactivate();clearCelebration();clearTimeout(returnTimer);selected=null;clearDrag();pointer=null;
   if(mode==='chase')breaker.load(getGiftState().bricks);
   update();if(mode==='chase'&&!done()&&dialog.open)breaker.activate();
 }
@@ -142,10 +145,7 @@ function releasePointer(event){
 }
 for(const type of ['pointerup','pointercancel','lostpointercapture'])field.addEventListener(type,releasePointer);
 replay.addEventListener('click',()=>{replayGiftGame(mode);startMode();(mode==='connect'?board.querySelector('button'):stage.querySelector('button')).focus({preventScroll:true});});
-next.addEventListener('click',()=>{
-  if(mode==='connect'){mode='chase';startMode();dialog.querySelector('#journey-title').focus({preventScroll:true});}
-  else {dialog.close();unlockGift();}
-});
+next.addEventListener('click',()=>dialog.close());
 dialog.querySelector('.star-play-close').addEventListener('click',()=>dialog.close());
 export function openGiftGame(requestedMode,source=document.activeElement){
   if(dialog.open)return;
@@ -155,9 +155,10 @@ export function openGiftGame(requestedMode,source=document.activeElement){
   startMode();dialog.showModal();resize();if(mode==='chase'&&!done())breaker.activate();
 }
 dialog.addEventListener('close',()=>{
-  breaker.deactivate();clearDrag();clearCelebration();hideHint();preview.hidden=true;pointer=null;document.body.classList.remove('surprise-open');document.body.style.top='';
+  breaker.deactivate();clearDrag();clearCelebration();clearTimeout(returnTimer);hideHint();preview.hidden=true;pointer=null;document.body.classList.remove('surprise-open');document.body.style.top='';
   const revealing=guided&&getGiftState().unlocked;window.scrollTo(0,revealing?0:scrollY);
-  if(!revealing&&opener instanceof HTMLElement&&!opener.closest('[hidden]'))opener.focus({preventScroll:true});
+  if(guided&&done())document.dispatchEvent(new Event('gift:game-return'));
+  else if(!revealing&&opener instanceof HTMLElement&&!opener.closest('[hidden]'))opener.focus({preventScroll:true});
 });
 new ResizeObserver(resize).observe(wrap);
 document.addEventListener('visibilitychange',()=>{if(document.hidden){clearDrag();hideHint();pointer=null;}});
