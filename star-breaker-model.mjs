@@ -1,6 +1,6 @@
-export const WIDTH=360,HEIGHT=490,COLUMNS=6,ROWS=7,TOTAL_BRICKS=COLUMNS*ROWS-4;
+export const WIDTH=360,HEIGHT=490,COLUMNS=6,ROWS=8,TOTAL_BRICKS=COLUMNS*ROWS-4;
 export const HEART_TARGET={x:180,y:118.5,r:17};
-export const PADDLE_WIDTH=92,MIN_SPEED=282,MAX_SPEED=355;
+export const PADDLE_WIDTH=76,MIN_SPEED=318,MAX_SPEED=405;
 const clamp=(n,min,max)=>Math.max(min,Math.min(max,n));
 export function createBreaker(cleared=[]){
   const gone=new Set(cleared),gap=6,width=(WIDTH-28-gap*(COLUMNS-1))/COLUMNS;
@@ -29,7 +29,7 @@ export function smoothPaddle(state,seconds){
 }
 export function launchBreaker(state){
   if(!['ready','missed'].includes(state.phase))return false;
-  movePaddle(state,state.paddle.x);state.serves++;state.ball.vx=state.serves%2?100:-112;state.ball.vy=-263;state.phase='playing';return true;
+  movePaddle(state,state.paddle.x);state.serves++;state.ball.vx=state.serves%2?120:-130;state.ball.vy=-295;state.phase='playing';return true;
 }
 function overlaps(ball,box){
   const dx=ball.x-clamp(ball.x,box.x,box.x+box.w),dy=ball.y-clamp(ball.y,box.y,box.y+box.h);

@@ -1,7 +1,7 @@
 import {DEG,starVector,dedicatedStarPosition} from './sky-math.mjs';
 import {describeSkyPosition} from './sky-description.mjs?v=20260924-home-map';
-import {getGiftState,nextGiftGame,subscribeGift,unlockGift,enterGift,resetGift} from './gift-state.mjs?v=20261005-fresh';
-import {openGiftGame} from './gift-games.mjs?v=20261005-fresh';
+import {getGiftState,nextGiftGame,subscribeGift,unlockGift,enterGift,resetGift} from './gift-state.mjs?v=20261005-challenge';
+import {openGiftGame} from './gift-games.mjs?v=20261005-challenge';
 const $=id=>document.getElementById(id);
 const A=window.Astronomy;
 const AMMAN={lat:31.9539,lon:35.9106,height:800,label:'عمّان'};

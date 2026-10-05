@@ -1,6 +1,7 @@
-import {GOALS,getGiftState,hitGiftBricks,completeBreaker,swapGiftPieces,replayGiftGame,unlockGift} from './gift-state.mjs?v=20261005-fresh';
-import {mountBreaker} from './star-breaker-view.mjs';
-import {WIDTH,HEIGHT,HEART_TARGET} from './star-breaker-model.mjs';
+import {GOALS,getGiftState,hitGiftBricks,completeBreaker,swapGiftPieces,replayGiftGame,unlockGift} from './gift-state.mjs?v=20261005-challenge';
+import {mountBreaker} from './star-breaker-view.mjs?v=20261005-challenge';
+import {WIDTH,HEIGHT,HEART_TARGET} from './star-breaker-model.mjs?v=20261005-challenge';
+import {PUZZLE_SIDE} from './heart-puzzle.mjs?v=20261005-challenge';
 const dialog=document.getElementById('journey-dialog');
 let mode='connect',guided=true,opener=null,scrollY=0,pointer=null;
 let selected=null,dragStart=null,dragging=false,hintTimer=0,celebrationTimer=0;
@@ -14,7 +15,7 @@ dialog.innerHTML=`<div class="star-play-shell">
   <p id="play-instruction" class="play-instruction"></p>
   <button id="puzzle-hint" class="puzzle-hint">تلميح ◇</button>
   <div class="star-play-space"><div id="star-play-field" class="star-play-field">
-    <div id="heart-puzzle" class="heart-puzzle" dir="ltr" aria-label="تركيب قلب مالك، تسع قطع"></div>
+    <div id="heart-puzzle" class="heart-puzzle" dir="ltr" aria-label="تركيب قلب مالك، ست عشرة قطعة"></div>
     <div id="puzzle-ghost" class="puzzle-piece puzzle-ghost" aria-hidden="true" hidden></div>
     <img id="puzzle-preview" class="puzzle-preview" src="assets/malek-heart.svg" alt="القلب كاملًا، مرجع لتركيب القطع" hidden>
     <div id="breaker-stage" class="breaker-stage" tabindex="0" aria-label="الوصول لقلب مالك، حرّكي المضرب لتوصيل النجمة للقلب" hidden></div>
@@ -32,9 +33,9 @@ const breaker=mountBreaker(stage,controls,{
   onHit(ids){hitGiftBricks(ids);updateProgress();},
   onFinish(){completeBreaker();update();celebrate();dialog.querySelector('#play-result-title').focus({preventScroll:true});}
 });
-function paintPiece(element,piece){element.style.backgroundPosition=`${(piece%3)*50}% ${Math.floor(piece/3)*50}%`;}
+function paintPiece(element,piece){element.style.backgroundPosition=`${(piece%PUZZLE_SIDE)*100/(PUZZLE_SIDE-1)}% ${Math.floor(piece/PUZZLE_SIDE)*100/(PUZZLE_SIDE-1)}%`;}
 function renderPuzzle(){
-  board.innerHTML=getGiftState().board.map((piece,index)=>`<button class="puzzle-piece${index===selected?' selected':''}" data-cell="${index}" aria-label="قطعة ${index+1}" aria-pressed="${index===selected}" style="background-position:${(piece%3)*50}% ${Math.floor(piece/3)*50}%" ${done()?'disabled':''}></button>`).join('');
+  board.innerHTML=getGiftState().board.map((piece,index)=>`<button class="puzzle-piece${index===selected?' selected':''}" data-cell="${index}" aria-label="قطعة ${index+1}" aria-pressed="${index===selected}" style="background-position:${(piece%PUZZLE_SIDE)*100/(PUZZLE_SIDE-1)}% ${Math.floor(piece/PUZZLE_SIDE)*100/(PUZZLE_SIDE-1)}%" ${done()?'disabled':''}></button>`).join('');
 }
 function choosePiece(index){
   if(selected===null){selected=index;renderPuzzle();return;}
@@ -45,7 +46,7 @@ function choosePiece(index){
 function cellAt(point){
   const rect=board.getBoundingClientRect(),x=point.x-rect.left,y=point.y-rect.top;
   if(x<0||y<0||x>=rect.width||y>=rect.height)return null;
-  return Math.floor(y/rect.height*3)*3+Math.floor(x/rect.width*3);
+  return Math.floor(y/rect.height*PUZZLE_SIDE)*PUZZLE_SIDE+Math.floor(x/rect.width*PUZZLE_SIDE);
 }
 function clearDrag(){dragStart=null;dragging=false;ghost.hidden=true;board.classList.remove('dragging');board.querySelectorAll('.drop-target').forEach(el=>el.classList.remove('drop-target'));}
 function clearCelebration(){clearTimeout(celebrationTimer);celebration.replaceChildren();}
@@ -71,8 +72,8 @@ function celebrate(){
 }
 function updateProgress(){
   const state=getGiftState(),complete=done();
-  progress.textContent=complete?'✓':mode==='connect'?`${ar(state.connect)} من ٩ قطع بمكانها`:`بلوكات: ${ar(state.chase)}`;
-  dialog.querySelector('.play-progress-dots').innerHTML=mode==='connect'?Array.from({length:9},(_,i)=>`<span class="${i<state.connect?'filled':''}"></span>`).join(''):'';
+  progress.textContent=complete?'✓':mode==='connect'?`${ar(state.connect)} من ${ar(GOALS.connect)} قطعة بمكانها`:`بلوكات: ${ar(state.chase)}`;
+  dialog.querySelector('.play-progress-dots').innerHTML=mode==='connect'?Array.from({length:GOALS.connect},(_,i)=>`<span class="${i<state.connect?'filled':''}"></span>`).join(''):'';
 }
 function resize(){
   const rect=wrap.getBoundingClientRect(),ratio=mode==='connect'?1:WIDTH/HEIGHT;

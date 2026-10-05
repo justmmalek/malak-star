@@ -1,4 +1,4 @@
-import {WIDTH,HEIGHT,HEART_TARGET,PADDLE_WIDTH,createBreaker,aimPaddle,smoothPaddle,launchBreaker,stepBreaker} from './star-breaker-model.mjs';
+import {WIDTH,HEIGHT,HEART_TARGET,PADDLE_WIDTH,createBreaker,aimPaddle,smoothPaddle,launchBreaker,stepBreaker} from './star-breaker-model.mjs?v=20261005-challenge';
 
 export function mountBreaker(stage,controls,{onHit,onFinish}){
   const reduced=matchMedia('(prefers-reduced-motion: reduce)');
