@@ -35,3 +35,4 @@
 .play-breaker .star-play-header h2{font-size:clamp(23px,6.8vw,29px)}
 
 .play-connect:not(.play-complete) .puzzle-message{font-family:var(--font);font-size:clamp(18px,4.8vw,21px);font-weight:550;line-height:1.9;color:#ffe0ed}
+.play-connect .puzzle-hint{min-height:48px;padding:8px 26px;font-size:16px;font-weight:600;touch-action:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}

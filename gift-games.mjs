@@ -1,10 +1,10 @@
-import {GOALS,getGiftState,hitGiftBricks,completeBreaker,swapGiftPieces,replayGiftGame,unlockGift} from './gift-state.mjs?v=20261005-reveal';
+import {GOALS,getGiftState,hitGiftBricks,completeBreaker,swapGiftPieces,replayGiftGame,unlockGift} from './gift-state.mjs?v=20261005-easier';
 import {mountBreaker} from './star-breaker-view.mjs?v=20261005-challenge';
 import {WIDTH,HEIGHT,HEART_TARGET} from './star-breaker-model.mjs?v=20261005-challenge';
-import {PUZZLE_SIDE} from './heart-puzzle.mjs?v=20261005-challenge';
+import {PUZZLE_COLUMNS,PUZZLE_ROWS} from './heart-puzzle.mjs?v=20261005-easier';
 const dialog=document.getElementById('journey-dialog');
 let mode='connect',guided=true,opener=null,scrollY=0,pointer=null;
-let selected=null,dragStart=null,dragging=false,hintTimer=0,celebrationTimer=0;
+let selected=null,dragStart=null,dragging=false,hintPointer=null,hintKey=null,celebrationTimer=0;
 const ar=n=>n.toLocaleString('ar-JO');
 const done=()=>mode==='connect'?getGiftState().connect===GOALS.connect:getGiftState().heartFound;
 
@@ -13,9 +13,9 @@ dialog.innerHTML=`<div class="star-play-shell">
   <p class="game-chapter" id="game-chapter"></p>
   <p id="puzzle-message" class="puzzle-message" aria-live="polite"></p>
   <p id="play-instruction" class="play-instruction"></p>
-  <button id="puzzle-hint" class="puzzle-hint">تلميح ◇</button>
+  <button id="puzzle-hint" class="puzzle-hint" aria-label="تلميح" aria-controls="puzzle-preview" aria-pressed="false">تلميح ◇</button>
   <div class="star-play-space"><div id="star-play-field" class="star-play-field">
-    <div id="heart-puzzle" class="heart-puzzle" dir="ltr" aria-label="تركيب قلب مالك، ست عشرة قطعة"></div>
+    <div id="heart-puzzle" class="heart-puzzle" dir="ltr" aria-label="تركيب قلب مالك، اثنتا عشرة قطعة"></div>
     <div id="puzzle-ghost" class="puzzle-piece puzzle-ghost" aria-hidden="true" hidden></div>
     <img id="puzzle-preview" class="puzzle-preview" src="assets/malek-heart.svg" alt="القلب كاملًا، مرجع لتركيب القطع" hidden>
     <div id="breaker-stage" class="breaker-stage" tabindex="0" aria-label="الوصول لقلب مالك، حرّكي المضرب لتوصيل النجمة للقلب" hidden></div>
@@ -33,9 +33,9 @@ const breaker=mountBreaker(stage,controls,{
   onHit(ids){hitGiftBricks(ids);updateProgress();},
   onFinish(){completeBreaker();update();celebrate();dialog.querySelector('#play-result-title').focus({preventScroll:true});}
 });
-function paintPiece(element,piece){element.style.backgroundPosition=`${(piece%PUZZLE_SIDE)*100/(PUZZLE_SIDE-1)}% ${Math.floor(piece/PUZZLE_SIDE)*100/(PUZZLE_SIDE-1)}%`;}
+function paintPiece(element,piece){element.style.backgroundPosition=`${(piece%PUZZLE_COLUMNS)*100/(PUZZLE_COLUMNS-1)}% ${Math.floor(piece/PUZZLE_COLUMNS)*100/(PUZZLE_ROWS-1)}%`;}
 function renderPuzzle(){
-  board.innerHTML=getGiftState().board.map((piece,index)=>`<button class="puzzle-piece${index===selected?' selected':''}" data-cell="${index}" aria-label="قطعة ${index+1}" aria-pressed="${index===selected}" style="background-position:${(piece%PUZZLE_SIDE)*100/(PUZZLE_SIDE-1)}% ${Math.floor(piece/PUZZLE_SIDE)*100/(PUZZLE_SIDE-1)}%" ${done()?'disabled':''}></button>`).join('');
+  board.innerHTML=getGiftState().board.map((piece,index)=>`<button class="puzzle-piece${index===selected?' selected':''}" data-cell="${index}" aria-label="قطعة ${index+1}" aria-pressed="${index===selected}" style="background-position:${(piece%PUZZLE_COLUMNS)*100/(PUZZLE_COLUMNS-1)}% ${Math.floor(piece/PUZZLE_COLUMNS)*100/(PUZZLE_ROWS-1)}%" ${done()?'disabled':''}></button>`).join('');
 }
 function choosePiece(index){
   if(selected===null){selected=index;renderPuzzle();return;}
@@ -46,7 +46,7 @@ function choosePiece(index){
 function cellAt(point){
   const rect=board.getBoundingClientRect(),x=point.x-rect.left,y=point.y-rect.top;
   if(x<0||y<0||x>=rect.width||y>=rect.height)return null;
-  return Math.floor(y/rect.height*PUZZLE_SIDE)*PUZZLE_SIDE+Math.floor(x/rect.width*PUZZLE_SIDE);
+  return Math.floor(y/rect.height*PUZZLE_ROWS)*PUZZLE_COLUMNS+Math.floor(x/rect.width*PUZZLE_COLUMNS);
 }
 function clearDrag(){dragStart=null;dragging=false;ghost.hidden=true;board.classList.remove('dragging');board.querySelectorAll('.drop-target').forEach(el=>el.classList.remove('drop-target'));}
 function clearCelebration(){clearTimeout(celebrationTimer);celebration.replaceChildren();}
@@ -89,7 +89,7 @@ function update(){
   dialog.querySelector('#game-chapter').textContent=guided?`${puzzle?'١':'٢'} من ٢`:'';
   message.hidden=!puzzle;message.textContent=complete?'بحبك يماما':'هاد قلبي الي لخبطتيه بحلاوتك يلا صليحه';
   instruction.textContent=complete?'':puzzle?'بدّلي قطعتين بلمستين، أو اسحبي قطعة مكان الثانية.':'حرّكي المضرب بإصبعكِ ووصّلي النجمة للقلب.';
-  board.hidden=!puzzle||complete;hint.hidden=!puzzle||complete;preview.hidden=!puzzle||!complete;hint.setAttribute('aria-pressed','false');clearTimeout(hintTimer);
+  board.hidden=!puzzle||complete;hint.hidden=!puzzle||complete;preview.hidden=!puzzle||!complete;hint.setAttribute('aria-pressed','false');hintPointer=null;hintKey=null;
   if(puzzle)renderPuzzle();
   stage.hidden=puzzle;controls.hidden=puzzle||complete;result.hidden=puzzle||!complete;replay.hidden=!complete||guided;next.hidden=!complete||!guided;
   dialog.querySelector('#play-result-title').textContent='بحبككككككككككككك';
@@ -100,7 +100,18 @@ function startMode(){
   if(mode==='chase')breaker.load(getGiftState().bricks);
   update();if(mode==='chase'&&!done()&&dialog.open)breaker.activate();
 }
-hint.addEventListener('click',()=>{preview.hidden=false;hint.setAttribute('aria-pressed','true');clearTimeout(hintTimer);hintTimer=setTimeout(()=>{preview.hidden=true;hint.setAttribute('aria-pressed','false');},2200);});
+function showHint(){if(mode!=='connect'||done()||hint.hidden)return;preview.hidden=false;hint.setAttribute('aria-pressed','true');}
+function hideHint(){hintPointer=null;hintKey=null;preview.hidden=mode!=='connect'||!done();hint.setAttribute('aria-pressed','false');}
+hint.addEventListener('pointerdown',event=>{
+  if(!event.isPrimary||event.button!==0)return;
+  event.preventDefault();hint.focus({preventScroll:true});hintPointer=event.pointerId;hint.setPointerCapture(hintPointer);showHint();
+});
+for(const type of ['pointerup','pointercancel','lostpointercapture'])hint.addEventListener(type,event=>{if(event.pointerId===hintPointer)hideHint();});
+hint.addEventListener('keydown',event=>{if(![' ','Enter'].includes(event.key))return;event.preventDefault();hintKey=event.key;showHint();});
+hint.addEventListener('keyup',event=>{if(event.key===hintKey){event.preventDefault();hideHint();}});
+hint.addEventListener('blur',hideHint);
+hint.addEventListener('contextmenu',event=>event.preventDefault());
+window.addEventListener('blur',hideHint);
 board.addEventListener('click',event=>{const piece=event.target.closest('[data-cell]');if(piece&&event.detail===0&&!done()){const index=Number(piece.dataset.cell);choosePiece(index);if(!done())board.querySelector(`[data-cell="${index}"]`).focus({preventScroll:true});}});
 field.addEventListener('pointerdown',event=>{
   if(mode!=='connect'||!event.isPrimary||event.button!==0||done())return;
@@ -135,9 +146,9 @@ export function openGiftGame(requestedMode,source=document.activeElement){
   startMode();dialog.showModal();resize();if(mode==='chase'&&!done())breaker.activate();
 }
 dialog.addEventListener('close',()=>{
-  breaker.deactivate();clearDrag();clearCelebration();clearTimeout(hintTimer);preview.hidden=true;pointer=null;document.body.classList.remove('surprise-open');document.body.style.top='';
+  breaker.deactivate();clearDrag();clearCelebration();hideHint();preview.hidden=true;pointer=null;document.body.classList.remove('surprise-open');document.body.style.top='';
   const revealing=guided&&getGiftState().unlocked;window.scrollTo(0,revealing?0:scrollY);
   if(!revealing&&opener instanceof HTMLElement&&!opener.closest('[hidden]'))opener.focus({preventScroll:true});
 });
 new ResizeObserver(resize).observe(wrap);
-document.addEventListener('visibilitychange',()=>{if(document.hidden){clearDrag();pointer=null;}});
+document.addEventListener('visibilitychange',()=>{if(document.hidden){clearDrag();hideHint();pointer=null;}});

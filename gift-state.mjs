@@ -1,4 +1,4 @@
-import {PUZZLE_SIZE,shuffleHeart,correctPieces,swapPieces} from './heart-puzzle.mjs?v=20261005-challenge';
+import {PUZZLE_SIZE,shuffleHeart,correctPieces,swapPieces} from './heart-puzzle.mjs?v=20261005-easier';
 import {TOTAL_BRICKS} from './star-breaker-model.mjs?v=20261005-challenge';
 export const GOALS={connect:PUZZLE_SIZE,chase:TOTAL_BRICKS};
 const STORAGE='malak-gift-journey-v4';
