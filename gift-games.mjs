@@ -1,7 +1,7 @@
-import {GOALS,getGiftState,hitGiftBricks,completeBreaker,swapGiftPieces,replayGiftGame,unlockGift} from './gift-state.mjs?v=20261005-easier';
+import {GOALS,getGiftState,hitGiftBricks,completeBreaker,swapGiftPieces,replayGiftGame,unlockGift} from './gift-state.mjs?v=20261005-fit';
 import {mountBreaker} from './star-breaker-view.mjs?v=20261005-challenge';
 import {WIDTH,HEIGHT,HEART_TARGET} from './star-breaker-model.mjs?v=20261005-challenge';
-import {PUZZLE_COLUMNS,PUZZLE_ROWS} from './heart-puzzle.mjs?v=20261005-easier';
+import {PUZZLE_COLUMNS,PUZZLE_ROWS,heartPieceRect,isPiecePlaced} from './heart-puzzle.mjs?v=20261005-fit';
 const dialog=document.getElementById('journey-dialog');
 let mode='connect',guided=true,opener=null,scrollY=0,pointer=null;
 let selected=null,dragStart=null,dragging=false,hintPointer=null,hintKey=null,celebrationTimer=0;
@@ -33,11 +33,19 @@ const breaker=mountBreaker(stage,controls,{
   onHit(ids){hitGiftBricks(ids);updateProgress();},
   onFinish(){completeBreaker();update();celebrate();dialog.querySelector('#play-result-title').focus({preventScroll:true});}
 });
-function paintPiece(element,piece){element.style.backgroundPosition=`${(piece%PUZZLE_COLUMNS)*100/(PUZZLE_COLUMNS-1)}% ${Math.floor(piece/PUZZLE_COLUMNS)*100/(PUZZLE_ROWS-1)}%`;}
+function pieceArt(piece){
+  const {x,y,width,height}=heartPieceRect(piece);
+  return `<svg class="puzzle-art" viewBox="${x} ${y} ${width} ${height}" preserveAspectRatio="none" aria-hidden="true" focusable="false"><image href="assets/malek-heart.svg" x="0" y="0" width="600" height="600"/></svg>`;
+}
+function paintPiece(element,piece){element.innerHTML=pieceArt(piece);}
 function renderPuzzle(){
-  board.innerHTML=getGiftState().board.map((piece,index)=>`<button class="puzzle-piece${index===selected?' selected':''}" data-cell="${index}" aria-label="قطعة ${index+1}" aria-pressed="${index===selected}" style="background-position:${(piece%PUZZLE_COLUMNS)*100/(PUZZLE_COLUMNS-1)}% ${Math.floor(piece/PUZZLE_COLUMNS)*100/(PUZZLE_ROWS-1)}%" ${done()?'disabled':''}></button>`).join('');
+  board.innerHTML=getGiftState().board.map((piece,index)=>{
+    const placed=isPiecePlaced(piece,index);
+    return `<button class="puzzle-piece${placed?' placed':''}${index===selected?' selected':''}" data-cell="${index}" aria-label="قطعة ${index+1}${placed?'، بمكانها الصح':''}" aria-pressed="${index===selected}" ${placed?'disabled':''}>${pieceArt(piece)}${placed?'<span class="puzzle-check" aria-hidden="true">✓</span>':''}</button>`;
+  }).join('');
 }
 function choosePiece(index){
+  if(isPiecePlaced(getGiftState().board[index],index))return;
   if(selected===null){selected=index;renderPuzzle();return;}
   if(selected===index){selected=null;renderPuzzle();return;}
   swapGiftPieces(selected,index);selected=null;update();
@@ -46,7 +54,8 @@ function choosePiece(index){
 function cellAt(point){
   const rect=board.getBoundingClientRect(),x=point.x-rect.left,y=point.y-rect.top;
   if(x<0||y<0||x>=rect.width||y>=rect.height)return null;
-  return Math.floor(y/rect.height*PUZZLE_ROWS)*PUZZLE_COLUMNS+Math.floor(x/rect.width*PUZZLE_COLUMNS);
+  const index=Math.floor(y/rect.height*PUZZLE_ROWS)*PUZZLE_COLUMNS+Math.floor(x/rect.width*PUZZLE_COLUMNS);
+  return isPiecePlaced(getGiftState().board[index],index)?null:index;
 }
 function clearDrag(){dragStart=null;dragging=false;ghost.hidden=true;board.classList.remove('dragging');board.querySelectorAll('.drop-target').forEach(el=>el.classList.remove('drop-target'));}
 function clearCelebration(){clearTimeout(celebrationTimer);celebration.replaceChildren();}
@@ -88,7 +97,7 @@ function update(){
   dialog.querySelector('#journey-title').textContent=puzzle?'تركيب قلب مالك':'الوصول لقلب مالك';
   dialog.querySelector('#game-chapter').textContent=guided?`${puzzle?'١':'٢'} من ٢`:'';
   message.hidden=!puzzle;message.textContent=complete?'بحبك يماما':'هاد قلبي الي لخبطتيه بحلاوتك يلا صليحه';
-  instruction.textContent=complete?'':puzzle?'بدّلي قطعتين بلمستين، أو اسحبي قطعة مكان الثانية.':'حرّكي المضرب بإصبعكِ ووصّلي النجمة للقلب.';
+  instruction.textContent=complete?'':puzzle?'بدّلي قطعتين أو اسحبيهم؛ القطعة الصح بتثبت لحالها.':'حرّكي المضرب بإصبعكِ ووصّلي النجمة للقلب.';
   board.hidden=!puzzle||complete;hint.hidden=!puzzle||complete;preview.hidden=!puzzle||!complete;hint.setAttribute('aria-pressed','false');hintPointer=null;hintKey=null;
   if(puzzle)renderPuzzle();
   stage.hidden=puzzle;controls.hidden=puzzle||complete;result.hidden=puzzle||!complete;replay.hidden=!complete||guided;next.hidden=!complete||!guided;
@@ -112,10 +121,10 @@ hint.addEventListener('keyup',event=>{if(event.key===hintKey){event.preventDefau
 hint.addEventListener('blur',hideHint);
 hint.addEventListener('contextmenu',event=>event.preventDefault());
 window.addEventListener('blur',hideHint);
-board.addEventListener('click',event=>{const piece=event.target.closest('[data-cell]');if(piece&&event.detail===0&&!done()){const index=Number(piece.dataset.cell);choosePiece(index);if(!done())board.querySelector(`[data-cell="${index}"]`).focus({preventScroll:true});}});
+board.addEventListener('click',event=>{const piece=event.target.closest('[data-cell]');if(piece&&event.detail===0&&!done()){const index=Number(piece.dataset.cell);choosePiece(index);if(!done())(board.querySelector(`[data-cell="${index}"]:not(:disabled)`)||board.querySelector('button:not(:disabled)'))?.focus({preventScroll:true});}});
 field.addEventListener('pointerdown',event=>{
   if(mode!=='connect'||!event.isPrimary||event.button!==0||done())return;
-  const piece=event.target.closest('[data-cell]');if(!piece||!preview.hidden)return;
+  const piece=event.target.closest('[data-cell]');if(!piece||piece.disabled||!preview.hidden)return;
   event.preventDefault();pointer=event.pointerId;field.setPointerCapture(pointer);dragStart={x:event.clientX,y:event.clientY,index:Number(piece.dataset.cell)};
 });
 field.addEventListener('pointermove',event=>{

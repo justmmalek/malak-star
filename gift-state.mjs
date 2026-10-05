@@ -1,4 +1,4 @@
-import {PUZZLE_SIZE,shuffleHeart,correctPieces,swapPieces} from './heart-puzzle.mjs?v=20261005-easier';
+import {PUZZLE_SIZE,shuffleHeart,correctPieces,isPiecePlaced,swapPieces} from './heart-puzzle.mjs?v=20261005-fit';
 import {TOTAL_BRICKS} from './star-breaker-model.mjs?v=20261005-challenge';
 export const GOALS={connect:PUZZLE_SIZE,chase:TOTAL_BRICKS};
 const STORAGE='malak-gift-journey-v4';
@@ -22,7 +22,7 @@ export function hitGiftBricks(ids){
 }
 export function completeBreaker(){state.heartFound=true;state.completed.chase=true;notify('progress');}
 export function replayGiftGame(mode){if(!(mode in GOALS))return;if(mode==='connect'){state.board=shuffleHeart();state.puzzleMoves=0;state.connect=correctPieces(state.board);}else {state.chase=0;state.bricks=[];state.heartFound=false;}notify('replay');}
-export function swapGiftPieces(a,b){if(a===b)return;state.puzzleMoves++;state.board=swapPieces(state.board,a,b);state.connect=correctPieces(state.board);if(state.connect===GOALS.connect)state.completed.connect=true;notify('progress');}
+export function swapGiftPieces(a,b){if(a===b||![a,b].every(n=>Number.isInteger(n)&&n>=0&&n<GOALS.connect)||isPiecePlaced(state.board[a],a)||isPiecePlaced(state.board[b],b))return;state.puzzleMoves++;state.board=swapPieces(state.board,a,b);state.connect=correctPieces(state.board);if(state.connect===GOALS.connect)state.completed.connect=true;notify('progress');}
 export function unlockGift(){if(nextGiftGame())return false;state.unlocked=true;notify('unlock');return true;}
 export function enterGift(){if(!state.unlocked)return false;state.entered=true;notify('enter');return true;}
 export function resetGift(){state=fresh();notify('reset');}
