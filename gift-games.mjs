@@ -1,4 +1,4 @@
-import {GOALS,getGiftState,hitGiftBricks,completeBreaker,swapGiftPieces,replayGiftGame,unlockGift} from './gift-state.mjs';
+import {GOALS,getGiftState,hitGiftBricks,completeBreaker,swapGiftPieces,replayGiftGame,unlockGift} from './gift-state.mjs?v=20261005-fresh';
 import {mountBreaker} from './star-breaker-view.mjs';
 import {WIDTH,HEIGHT,HEART_TARGET} from './star-breaker-model.mjs';
 const dialog=document.getElementById('journey-dialog');

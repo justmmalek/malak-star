@@ -1,14 +1,13 @@
 import {DEG,starVector,dedicatedStarPosition} from './sky-math.mjs';
 import {describeSkyPosition} from './sky-description.mjs?v=20260924-home-map';
-import {getGiftState,nextGiftGame,subscribeGift,unlockGift,enterGift,resetGift} from './gift-state.mjs';
-import {openGiftGame} from './gift-games.mjs';
+import {getGiftState,nextGiftGame,subscribeGift,unlockGift,enterGift,resetGift} from './gift-state.mjs?v=20261005-fresh';
+import {openGiftGame} from './gift-games.mjs?v=20261005-fresh';
 const $=id=>document.getElementById(id);
 const A=window.Astronomy;
 const AMMAN={lat:31.9539,lon:35.9106,height:800,label:'عمّان'};
 const location=AMMAN;
 let catalog=[],currentView='gate',position=null;
-const initialGift=getGiftState();
-let introSeen=initialGift.puzzleMoves>0||initialGift.chase>0||initialGift.completed.connect;
+let introSeen=false;
 const buttons=[...document.querySelectorAll('[data-view]')];
 function showView(view){
   const state=getGiftState();
@@ -51,9 +50,10 @@ $('reset-gift').addEventListener('click',()=>{
 subscribeGift((state,reason)=>{
   updateGate();
   if(reason==='unlock'){showView('certificate');$('certificate-title').focus({preventScroll:true});}
-  if(reason==='reset'){introSeen=false;document.dispatchEvent(new Event('gift:reset'));showView('intro');$('intro-title').focus({preventScroll:true});}
+  if(reason==='reset'){for(const dialog of document.querySelectorAll('dialog[open]'))dialog.close();introSeen=false;document.dispatchEvent(new Event('gift:reset'));showView('intro');$('intro-title').focus({preventScroll:true});}
 });
-updateGate();showView(getGiftState().entered?'home':getGiftState().unlocked?'certificate':'gate');
+window.addEventListener('pageshow',event=>{if(event.persisted)resetGift();});
+updateGate();showView('intro');
 function refresh(){
   if(!A){$('visibility-home').textContent='تعذّر تحميل حسابات السماء. أعيدي فتح الصفحة.';return;}
   try{position=dedicatedStarPosition(new Date(),location,A);}catch(error){$('visibility-home').textContent='تعذّر حساب موقع النجمة. أعيدي المحاولة.';return;}

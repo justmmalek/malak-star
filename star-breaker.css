@@ -33,3 +33,5 @@
 .breaker-slider::-moz-range-thumb{width:18px;height:18px;border:1px solid #fff0cd;border-radius:50%;background:#efd7a9;box-shadow:0 0 12px #e6bc7955}
 .breaker-slider:focus-visible{outline:1px solid #e5c894;outline-offset:2px;border-radius:16px}
 .play-breaker .star-play-header h2{font-size:clamp(23px,6.8vw,29px)}
+
+.play-connect:not(.play-complete) .puzzle-message{font-family:var(--font);font-size:clamp(18px,4.8vw,21px);font-weight:550;line-height:1.9;color:#ffe0ed}

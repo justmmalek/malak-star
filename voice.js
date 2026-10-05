@@ -122,6 +122,6 @@
   document.addEventListener('visibilitychange', () => {
     if (document.hidden && (playing || loading)) pauseVoice();
   });
-  document.addEventListener('gift:reset', () => { if (playing || loading) pauseVoice(); });
+  document.addEventListener('gift:reset', () => { if (playing || loading) pauseVoice(); offset = 0; seeking = false; render(); });
   button.disabled = false;
 })();
