@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="600" viewBox="0 0 600 600">
+<defs><radialGradient id="sky"><stop stop-color="#33344e"/><stop offset="1" stop-color="#101a2d"/></radialGradient><linearGradient id="rose" x1="0" y1="0" x2=".8" y2="1"><stop stop-color="#ffd5e5"/><stop offset=".5" stop-color="#e8b4cc"/><stop offset="1" stop-color="#d4b178"/></linearGradient><radialGradient id="glow"><stop stop-color="#d8a2bc" stop-opacity=".24"/><stop offset="1" stop-color="#ce91b3" stop-opacity="0"/></radialGradient><filter id="soft"><feGaussianBlur stdDeviation="8"/></filter></defs>
+<path fill="url(#sky)" d="M0 0h600v600H0z"/><circle cx="300" cy="310" r="275" fill="url(#glow)"/>
+<g fill="none" stroke="#77859f" stroke-opacity=".3" stroke-width="1.5"><path d="M12 158L59 65 147 93 195 25M465 30L500 90 579 146 549 199M31 409L77 514 148 542 182 586M450 562L541 523 588 420"/><path d="M16 319L70 281M505 345L588 299"/></g>
+<g fill="#d3deef"><circle cx="59" cy="65" r="3"/><circle cx="147" cy="93" r="2"/><circle cx="195" cy="25" r="2.5"/><circle cx="500" cy="90" r="2.5"/><circle cx="579" cy="146" r="3"/><circle cx="31" cy="409" r="3"/><circle cx="77" cy="514" r="2.5"/><circle cx="148" cy="542" r="3"/><circle cx="182" cy="586" r="2"/><circle cx="450" cy="562" r="3"/><circle cx="541" cy="523" r="2.5"/><circle cx="588" cy="420" r="3"/><circle cx="70" cy="281" r="2.5"/><circle cx="505" cy="345" r="2"/><circle cx="350" cy="58" r="2"/><circle cx="254" cy="545" r="1.5"/></g>
+<path d="M300 488C257 447 90 336 90 218C90 104 231 78 300 192C369 78 510 104 510 218C510 336 343 447 300 488Z" fill="none" stroke="#f9abc7" stroke-width="17" opacity=".45" filter="url(#soft)"/>
+<path d="M300 488C257 447 90 336 90 218C90 104 231 78 300 192C369 78 510 104 510 218C510 336 343 447 300 488Z" fill="#c899b211" stroke="url(#rose)" stroke-width="5"/>
+<g fill="#ffe2bd"><circle cx="90" cy="218" r="5"/><circle cx="145" cy="129" r="4"/><circle cx="240" cy="131" r="4"/><circle cx="300" cy="192" r="5"/><circle cx="414" cy="120" r="4"/><circle cx="510" cy="218" r="5"/><circle cx="461" cy="343" r="4"/><circle cx="371" cy="427" r="4"/><circle cx="300" cy="488" r="5"/><circle cx="184" cy="391" r="4"/><circle cx="107" cy="289" r="4"/></g>
+<path d="M300 245l5 16 16 5-16 5-5 16-5-16-16-5 16-5z" fill="#e8c58e"/>
+<text x="300" y="350" fill="#ffe2ed" text-anchor="middle" font-family="Georgia,serif" font-size="69" direction="rtl">مالك</text>
+<path d="M268 378h64" stroke="#d7b88a" stroke-width="1.5"/>
+</svg>

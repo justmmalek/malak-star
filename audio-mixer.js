@@ -24,5 +24,5 @@
     return context;
   }
   window.StarAudio = {unlock, setDucked, isDucked: () => ducked,
-    resume: () => context ? context.resume() : Promise.resolve()};
+    resume: () => context && context.state !== 'running' ? context.resume() : Promise.resolve()};
 })();

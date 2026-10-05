@@ -7,16 +7,19 @@
   <meta name="description" content="إلى ملك اليازوري، نجمة في السماء وحكاية من القلب.">
   <link rel="icon" href="assets/star.svg" type="image/svg+xml">
   <link rel="stylesheet" href="style.css?v=20260924-home-map">
-  <link rel="stylesheet" href="surprises.css?v=20261005">
+  <link rel="stylesheet" href="surprises.css?v=20261005-journey">
   <script src="vendor/astronomy.browser.min.js" defer></script>
-  <script type="module" src="app.js?v=20260924-home-map"></script>
-  <script src="audio-mixer.js?v=20260920-voice-balance2" defer></script>
-  <script src="music.js?v=20261005" defer></script>
+  <script type="module" src="app.js?v=20261005-smooth"></script>
+  <script src="audio-mixer.js?v=20261005-continuous" defer></script>
+  <script src="music.js?v=20261005-continuous" defer></script>
   <script src="voice.js?v=20260920-voice" defer></script>
-  <script src="surprises.js?v=20261005" defer></script>
+  <script src="surprises.js?v=20261005-journey" defer></script>
+  <link rel="stylesheet" href="star-play.css?v=20261005-touch">
+  <link rel="stylesheet" href="gift-flow.css?v=20261005-breaker">
+  <link rel="stylesheet" href="star-breaker.css?v=20261005-smooth">
 </head>
-<body>
-  <header class="site-header">
+<body class="gift-locked">
+  <header id="gift-header" class="site-header" hidden>
     <a class="brand" href="#" aria-label="نجمة ملك، الرئيسية"><span aria-hidden="true">✦</span> نجمة ملك</a>
     <nav aria-label="التنقل الرئيسي">
       <button class="nav-link active" data-view="home" aria-current="page">نجمتي</button>
@@ -31,13 +34,37 @@
     <audio id="background-music" src="assets/her-jvke.mp3" autoplay loop playsinline preload="auto" controls aria-label="her — JVKE"></audio>
     <p id="music-status" class="sr-only" role="status"></p>
   </aside>
-  <main>
+  <main id="gift-intro" class="gift-gate gift-intro" aria-labelledby="intro-title">
+    <div class="gate-content">
+      <div class="gate-star" aria-hidden="true"><span>✦</span><i>✧</i><i>✧</i></div>
+      <h1 id="intro-title" tabindex="-1">من فتره بحاول اعمل هاد الاشي بس كنت مشغول و كنت بستنا شغله تجهز تجهز بحبك يروحي</h1>
+      <button id="intro-continue" class="gift-primary">التالي</button>
+      <noscript><p class="notice">فعّلي JavaScript حتى تبدأ رحلة هديتكِ.</p></noscript>
+    </div>
+  </main>
+  <main id="gift-gate" class="gift-gate" aria-labelledby="gate-title" hidden>
+    <div class="gate-content">
+      <p class="gate-from"></p>
+      <div class="gate-star" aria-hidden="true"><span>✦</span><i>✧</i><i>✧</i></div>
+      <p class="gate-eyebrow"></p>
+      <h1 id="gate-title" tabindex="-1">خلصي الالعاب عشان تطلع لك المفاجأة</h1>
+      <ol class="gate-steps" aria-label="خطوات الوصول للمفاجأة">
+        <li id="gate-step-connect"><span class="step-icon" aria-hidden="true">♡</span><span>تركيب قلب مالك<small id="connect-step-status">الخطوة الأولى</small></span><b class="step-check" aria-hidden="true"></b></li>
+        <li id="gate-step-chase"><span class="step-icon" aria-hidden="true">✦</span><span>الوصول لقلب مالك<small id="chase-step-status">الخطوة الثانية</small></span><b class="step-check" aria-hidden="true"></b></li>
+      </ol>
+      <button id="gate-continue" class="gift-primary" disabled>ابدئي</button>
+      <button id="intro-back" class="reset-gift">رجوع</button>
+      <p id="gate-hint" class="gate-hint"></p>
+      <noscript><p class="notice">فعّلي JavaScript حتى تبدأ رحلة هديتكِ.</p></noscript>
+    </div>
+  </main>
+  <main id="gift-world" hidden>
     <section id="home-view" class="home-layout" aria-label="نجمة ملك في السماء">
       <div class="dedication">
         <p class="to-name">إلى ملك اليازوري</p>
         <h1>ملك،<br> إلك نجمة بالسما.</h1>
         <p class="love-line">كل ما تطلّعي لفوق، تذكّري إنك<br class="desktop-break"> أجمل نجمة بحياتي.</p>
-  <aside class="voice-note" id="voice-note" aria-label="رسالة صوتية من مالك إلى ملك">
+  <div id="home-voice-slot" class="voice-slot"><aside class="voice-note" id="voice-note" aria-label="رسالة صوتية من مالك إلى ملك">
     <div class="voice-player" dir="ltr">
       <button id="voice-toggle" class="voice-toggle" type="button" aria-label="تشغيل الرسالة الصوتية" aria-pressed="false" disabled><span id="voice-icon" aria-hidden="true">▶</span></button>
       <input id="voice-progress" type="range" min="0" max="26" step="0.05" value="0" aria-label="موضع الرسالة الصوتية" disabled>
@@ -45,12 +72,8 @@
     </div>
     <p id="voice-status" class="sr-only" role="status"></p>
     <noscript><audio controls src="assets/voice-from-malek.m4a" aria-label="رسالة مالك الصوتية"></audio></noscript>
-  </aside>
-        <div class="surprise-launchers" aria-label="مفاجآت إلكِ" hidden>
-          <button class="surprise-card" data-surprise="hearts" aria-haspopup="dialog"><span class="surprise-symbol" aria-hidden="true">♡</span><span>لعبة القلوب<small>خبّيتلك كلمة</small></span><span class="surprise-arrow" aria-hidden="true">↗</span></button>
-          <button class="surprise-card" data-surprise="notes" aria-haspopup="dialog"><span class="surprise-symbol" aria-hidden="true">✦</span><span>رسالة من نجمتكِ<small>اكبسي وشوفي</small></span><span class="surprise-arrow" aria-hidden="true">↗</span></button>
-        </div>
-        <button class="text-button" data-view="certificate">شهادتكِ</button>
+  </aside></div>
+        <button class="gold-button home-certificate" data-view="certificate">شهادتكِ</button>
       </div>
       <div class="atlas-column">
         <p class="map-kicker"><span aria-hidden="true">✦</span> مكان نجمتكِ الآن · سماء عمّان</p>
@@ -59,29 +82,26 @@
         <p class="map-caption">وسط الدائرة فوق راسكِ، وحافتها خط الأفق.</p>
         <p id="map-error" class="notice" hidden></p>
       </div>
+      <section class="gift-games" aria-labelledby="replay-title">
+        <h2 id="replay-title">الألعاب</h2>
+        <div class="surprise-launchers" aria-label="مفاجآت إلكِ" hidden>
+          <button class="surprise-card" data-game="connect" aria-haspopup="dialog"><span class="surprise-symbol" aria-hidden="true">♡</span><span>تركيب قلب مالك</span><span class="surprise-arrow" aria-hidden="true">↗</span></button>
+          <button class="surprise-card" data-game="chase" aria-haspopup="dialog"><span class="surprise-symbol" aria-hidden="true">✦</span><span>الوصول لقلب مالك</span><span class="surprise-arrow" aria-hidden="true">↗</span></button>
+          <button class="surprise-card" data-surprise="notes" aria-haspopup="dialog"><span class="surprise-symbol" aria-hidden="true">✧</span><span>رسالة من نجمتكِ<small>اكبسي وشوفي</small></span><span class="surprise-arrow" aria-hidden="true">↗</span></button>
+        </div>
+        <button id="reset-gift" class="reset-gift">من البداية ↺</button>
+      </section>
     </section>
     <section id="certificate-view" class="certificate-view" aria-labelledby="certificate-title" hidden>
-      <div class="certificate-heading"><div><button class="back-link" data-view="home">← العودة لنجمتي</button><h1 id="certificate-title">شهادتكِ.</h1></div><a class="gold-button download" href="assets/Malak-Alyazuri-Star-Certificate.pdf" download>تنزيل الشهادة PDF ↓</a></div>
+      <div class="certificate-heading"><p class="gate-eyebrow"></p><h1 id="certificate-title" tabindex="-1">شطورتيييي خلصتي الالعاب</h1><p class="certificate-intro"></p></div>
+      <div id="reveal-voice-slot" class="voice-slot"></div>
       <a class="certificate-preview" href="assets/Malak-Alyazuri-Star-Certificate.jpg" target="_blank" rel="noopener" aria-label="افتحي شهادة ملك بالحجم الكامل"><img src="assets/Malak-Alyazuri-Star-Certificate.jpg" alt="شهادة إهداء إلى ملك اليازوري، Malak Alyazuri، من مالك، بتاريخ 19 سبتمبر 2026" width="864" height="1244" loading="lazy"></a>
-      <p class="muted certificate-note">من مالك إلى ملك اليازوري.</p>
+      <a class="certificate-download" href="assets/Malak-Alyazuri-Star-Certificate.pdf" download>تنزيل الشهادة ↓</a>
+      <div class="reveal-actions"><button id="enter-world" class="gift-primary">التالي</button><p></p></div>
     </section>
-    <noscript><p class="notice">فعّلي JavaScript لعرض خريطة السماء. <a href="assets/Malak-Alyazuri-Star-Certificate.pdf">شهادة ملك متاحة هنا.</a></p></noscript>
   </main>
-  <dialog id="surprise-dialog" class="surprise-dialog" aria-labelledby="surprise-title">
+  <dialog id="surprise-dialog" class="surprise-dialog" aria-labelledby="note-title">
     <button class="surprise-close" aria-label="إغلاق المفاجأة" autofocus>×</button>
-    <div id="heart-surprise" hidden>
-      <p class="surprise-eyebrow">إلكِ إنتِ وبس</p>
-      <h2 id="surprise-title">خبّيتلك كلمة بين القلوب</h2>
-      <p class="surprise-instruction">اكبسي على القلوب الخمسة، وشوفي شو مخبّي.</p>
-      <div id="heart-field" class="heart-field" aria-label="القلوب الخمسة"></div>
-      <p id="heart-progress" class="heart-progress" role="status"></p>
-      <div id="heart-reveal" class="heart-reveal" hidden>
-        <span class="reveal-heart" aria-hidden="true">♥</span>
-        <h3 tabindex="-1">بحبك يا ملك</h3>
-        <p>كل هالقلوب إلكِ… وقلبي أولهم.</p>
-        <button id="heart-replay" class="outline-button">نلعب كمان مرة؟</button>
-      </div>
-    </div>
     <div id="note-surprise" hidden>
       <p class="surprise-eyebrow">من مالك إلكِ</p>
       <h2 id="note-title">نجمتكِ معها رسالة</h2>
@@ -90,6 +110,7 @@
       <button id="next-note" class="outline-button" hidden>رسالة كمان ✦</button>
     </div>
   </dialog>
-  <footer class="status-bar"><span>سماء عمّان · بتتحدّث تلقائيًا</span><time id="live-time"></time></footer>
+  <dialog id="journey-dialog" class="journey-dialog" aria-labelledby="journey-title"></dialog>
+  <footer id="gift-footer" class="status-bar" hidden><span>سماء عمّان · بتتحدّث تلقائيًا</span><time id="live-time"></time></footer>
 </body>
 </html>

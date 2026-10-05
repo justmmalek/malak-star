@@ -1,20 +1,59 @@
 import {DEG,starVector,dedicatedStarPosition} from './sky-math.mjs';
 import {describeSkyPosition} from './sky-description.mjs?v=20260924-home-map';
+import {getGiftState,nextGiftGame,subscribeGift,unlockGift,enterGift,resetGift} from './gift-state.mjs';
+import {openGiftGame} from './gift-games.mjs';
 const $=id=>document.getElementById(id);
 const A=window.Astronomy;
 const AMMAN={lat:31.9539,lon:35.9106,height:800,label:'عمّان'};
 const location=AMMAN;
-let catalog=[],currentView='home',position=null;
+let catalog=[],currentView='gate',position=null;
+const initialGift=getGiftState();
+let introSeen=initialGift.puzzleMoves>0||initialGift.chase>0||initialGift.completed.connect;
 const buttons=[...document.querySelectorAll('[data-view]')];
 function showView(view){
+  const state=getGiftState();
+  if(!state.unlocked)view=introSeen?'gate':'intro';
+  else if(!state.entered)view='certificate';
   currentView=view;
+  const locked=view==='gate'||view==='intro',reveal=view==='certificate';
+  $('gift-intro').hidden=view!=='intro';$('gift-gate').hidden=view!=='gate';$('gift-world').hidden=locked;
+  $('gift-header').hidden=!state.entered;$('gift-footer').hidden=view!=='home';
+  document.body.classList.toggle('gift-locked',locked);
+  document.body.classList.toggle('gift-reveal',reveal);
+  document.body.classList.toggle('gift-first-reveal',reveal&&!state.entered);
   for(const name of ['home','certificate']) $(`${name}-view`).hidden=name!==view;
+  if(!locked)$(reveal?'reveal-voice-slot':'home-voice-slot').append($('voice-note'));
   for(const button of document.querySelectorAll('nav [data-view]')) {const selected=button.dataset.view===view;button.classList.toggle('active',selected);if(selected)button.setAttribute('aria-current','page');else button.removeAttribute('aria-current');}
   if(view==='home') drawMap();
   window.scrollTo({top:0,behavior:'instant'});
 }
 buttons.forEach(button=>button.addEventListener('click',()=>showView(button.dataset.view)));
 document.querySelector('.brand').addEventListener('click',event=>{event.preventDefault();showView('home');});
+function updateGate(){
+  const state=getGiftState(),next=nextGiftGame();
+  for(const mode of ['connect','chase']){
+    const step=$(`gate-step-${mode}`),complete=state.completed[mode];
+    step.classList.toggle('step-done',complete);step.classList.toggle('step-current',next===mode);
+    step.querySelector('.step-check').textContent=complete?'✓':'';
+    $(`${mode}-step-status`).textContent=complete?'✓':mode==='connect'?'١ / ٢':'٢ / ٢';
+  }
+  $('gate-continue').disabled=false;
+  $('gate-continue').textContent=next?((next==='connect'?state.puzzleMoves:state[next])>0?'كمّلي':next==='connect'?'ابدئي':'التالي'):'المفاجأة';
+}
+$('gate-continue').addEventListener('click',()=>{const next=nextGiftGame();if(next)openGiftGame(next,$('gate-continue'));else unlockGift();});
+$('intro-continue').addEventListener('click',()=>{introSeen=true;showView('gate');$('gate-title').focus({preventScroll:true});});
+$('intro-back').addEventListener('click',()=>{introSeen=false;showView('intro');$('intro-title').focus({preventScroll:true});});
+document.querySelectorAll('[data-game]').forEach(button=>button.addEventListener('click',()=>openGiftGame(button.dataset.game,button)));
+$('enter-world').addEventListener('click',()=>{enterGift();showView('home');document.querySelector('.dedication h1').setAttribute('tabindex','-1');document.querySelector('.dedication h1').focus({preventScroll:true});});
+$('reset-gift').addEventListener('click',()=>{
+  if(confirm('ترجعي الألعاب من البداية؟'))resetGift();
+});
+subscribeGift((state,reason)=>{
+  updateGate();
+  if(reason==='unlock'){showView('certificate');$('certificate-title').focus({preventScroll:true});}
+  if(reason==='reset'){introSeen=false;document.dispatchEvent(new Event('gift:reset'));showView('intro');$('intro-title').focus({preventScroll:true});}
+});
+updateGate();showView(getGiftState().entered?'home':getGiftState().unlocked?'certificate':'gate');
 function refresh(){
   if(!A){$('visibility-home').textContent='تعذّر تحميل حسابات السماء. أعيدي فتح الصفحة.';return;}
   try{position=dedicatedStarPosition(new Date(),location,A);}catch(error){$('visibility-home').textContent='تعذّر حساب موقع النجمة. أعيدي المحاولة.';return;}
