@@ -1,4 +1,4 @@
-import {GOALS,getGiftState,hitGiftBricks,completeBreaker,swapGiftPieces,replayGiftGame,unlockGift} from './gift-state.mjs?v=20261005-challenge';
+import {GOALS,getGiftState,hitGiftBricks,completeBreaker,swapGiftPieces,replayGiftGame,unlockGift} from './gift-state.mjs?v=20261005-reveal';
 import {mountBreaker} from './star-breaker-view.mjs?v=20261005-challenge';
 import {WIDTH,HEIGHT,HEART_TARGET} from './star-breaker-model.mjs?v=20261005-challenge';
 import {PUZZLE_SIDE} from './heart-puzzle.mjs?v=20261005-challenge';
@@ -68,7 +68,10 @@ function celebrate(){
       heart('heart-fragment',x,y,Math.cos(angle)*radius,Math.sin(angle)*radius,13+Math.random()*12,delay+1180,colors[(i+j)%4]);
     }
   }
-  celebrationTimer=setTimeout(clearCelebration,6000);
+  celebrationTimer=setTimeout(()=>{
+    clearCelebration();
+    if(guided&&mode==='chase'&&done()&&dialog.open){dialog.close();unlockGift();}
+  },reduced?2500:6000);
 }
 function updateProgress(){
   const state=getGiftState(),complete=done();

@@ -1,21 +1,20 @@
 import {DEG,starVector,dedicatedStarPosition} from './sky-math.mjs';
 import {describeSkyPosition} from './sky-description.mjs?v=20260924-home-map';
-import {getGiftState,nextGiftGame,subscribeGift,unlockGift,enterGift,resetGift} from './gift-state.mjs?v=20261005-challenge';
-import {openGiftGame} from './gift-games.mjs?v=20261005-challenge';
+import {getGiftState,nextGiftGame,resolveGiftView,subscribeGift,unlockGift,enterGift,resetGift} from './gift-state.mjs?v=20261005-reveal';
+import {openGiftGame} from './gift-games.mjs?v=20261005-reveal';
 const $=id=>document.getElementById(id);
 const A=window.Astronomy;
 const AMMAN={lat:31.9539,lon:35.9106,height:800,label:'عمّان'};
 const location=AMMAN;
 let catalog=[],currentView='gate',position=null;
-let introSeen=false;
+let introSeen=false,giftSeen=false;
 const buttons=[...document.querySelectorAll('[data-view]')];
 function showView(view){
   const state=getGiftState();
-  if(!state.unlocked)view=introSeen?'gate':'intro';
-  else if(!state.entered)view='certificate';
+  view=resolveGiftView(state,{introSeen,giftSeen},view);
   currentView=view;
-  const locked=view==='gate'||view==='intro',reveal=view==='certificate';
-  $('gift-intro').hidden=view!=='intro';$('gift-gate').hidden=view!=='gate';$('gift-world').hidden=locked;
+  const locked=view==='gate'||view==='intro'||view==='surprise',reveal=view==='certificate';
+  $('gift-intro').hidden=view!=='intro';$('gift-gate').hidden=view!=='gate';$('gift-surprise').hidden=view!=='surprise';$('gift-world').hidden=locked;
   $('gift-header').hidden=!state.entered;$('gift-footer').hidden=view!=='home';
   document.body.classList.toggle('gift-locked',locked);
   document.body.classList.toggle('gift-reveal',reveal);
@@ -42,6 +41,7 @@ function updateGate(){
 $('gate-continue').addEventListener('click',()=>{const next=nextGiftGame();if(next)openGiftGame(next,$('gate-continue'));else unlockGift();});
 $('intro-continue').addEventListener('click',()=>{introSeen=true;showView('gate');$('gate-title').focus({preventScroll:true});});
 $('intro-back').addEventListener('click',()=>{introSeen=false;showView('intro');$('intro-title').focus({preventScroll:true});});
+$('show-gift').addEventListener('click',()=>{giftSeen=true;showView('certificate');$('certificate-title').focus({preventScroll:true});});
 document.querySelectorAll('[data-game]').forEach(button=>button.addEventListener('click',()=>openGiftGame(button.dataset.game,button)));
 $('enter-world').addEventListener('click',()=>{enterGift();showView('home');document.querySelector('.dedication h1').setAttribute('tabindex','-1');document.querySelector('.dedication h1').focus({preventScroll:true});});
 $('reset-gift').addEventListener('click',()=>{
@@ -49,8 +49,8 @@ $('reset-gift').addEventListener('click',()=>{
 });
 subscribeGift((state,reason)=>{
   updateGate();
-  if(reason==='unlock'){showView('certificate');$('certificate-title').focus({preventScroll:true});}
-  if(reason==='reset'){for(const dialog of document.querySelectorAll('dialog[open]'))dialog.close();introSeen=false;document.dispatchEvent(new Event('gift:reset'));showView('intro');$('intro-title').focus({preventScroll:true});}
+  if(reason==='unlock'){showView('surprise');$('surprise-title').focus({preventScroll:true});}
+  if(reason==='reset'){for(const dialog of document.querySelectorAll('dialog[open]'))dialog.close();introSeen=false;giftSeen=false;document.dispatchEvent(new Event('gift:reset'));showView('intro');$('intro-title').focus({preventScroll:true});}
 });
 window.addEventListener('pageshow',event=>{if(event.persisted)resetGift();});
 updateGate();showView('intro');

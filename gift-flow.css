@@ -40,3 +40,6 @@
 .play-connect.play-complete .heart-puzzle{gap:0;border-radius:12px;overflow:hidden;box-shadow:0 0 50px #e7b6d21c}.play-complete .puzzle-piece{border:0;border-radius:0;opacity:1;box-shadow:none;cursor:default}.play-connect .star-play-result{display:none}
 @media(max-width:360px){.play-connect .play-instruction{font-size:11px}.heart-puzzle{gap:4px}.puzzle-ghost{width:calc((100% - 12px)/4);height:calc((100% - 12px)/4)}}
 @media(max-height:600px){.puzzle-hint{margin-top:4px;min-height:38px}.play-connect .play-instruction{margin-top:5px}.play-connect .game-chapter{min-height:12px}}
+
+.gift-surprise .gate-content h1{font:550 clamp(21px,5.8vw,26px)/1.9 var(--font);color:#ffe0ed;overflow-wrap:anywhere}.gift-surprise .surprise-message{font:500 17px/2 var(--font);color:#e6ddec;margin:20px 0 0}.gift-surprise .gift-primary{margin-top:30px}
+.gift-reminder{max-width:390px;margin:24px auto 12px;font:500 17px/2 var(--font);color:#f0d0df;text-align:center}

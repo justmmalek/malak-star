@@ -9,6 +9,11 @@ try{globalThis.localStorage?.removeItem(STORAGE);}catch{/* Storage access is opt
 const listeners=new Set();
 export function getGiftState(){return {...state,bricks:[...state.bricks],board:[...state.board],completed:{...state.completed}};}
 export function nextGiftGame(){return !state.completed.connect?'connect':!state.completed.chase?'chase':null;}
+export function resolveGiftView(current,{introSeen=false,giftSeen=false}={},requested='home'){
+  if(!current.unlocked)return introSeen?'gate':'intro';
+  if(!current.entered)return giftSeen?'certificate':'surprise';
+  return requested==='certificate'?'certificate':'home';
+}
 export function subscribeGift(listener){listeners.add(listener);return()=>listeners.delete(listener);}
 function notify(reason){for(const listener of listeners)listener(getGiftState(),reason);}
 export function hitGiftBricks(ids){
